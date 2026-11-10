@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Nova OS</title>
+<style>
+/* ============ BASE ============ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;height:100%;overflow:hidden;}
+body{
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 0%,#1a1a2e,#08080c 70%);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#fff;user-select:none;
+}
+button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer;padding:0;}
+::-webkit-scrollbar{display:none;}
+
+/* ============ DEVICE ============ */
+.device{
+  position:relative;
+  height:min(846px,96vh);
+  aspect-ratio:392/846;
+  border-radius:56px;
+  padding:13px;
+  background:linear-gradient(150deg,#63636b,#202024 35%,#0a0a0c);
+  box-shadow:0 0 0 1px #000,0 40px 100px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14);
+}
+.btn-silent,.btn-vol,.btn-power{position:absolute;border-radius:2px;background:linear-gradient(180deg,#4a4a52,#26262b);}
+.btn-silent{left:-2.5px;top:140px;width:3px;height:32px;}
+.btn-vol.up{left:-2.5px;top:196px;width:3px;height:58px;}
+.btn-vol.down{left:-2.5px;top:266px;width:3px;height:58px;}
+.btn-power{right:-2.5px;top:210px;width:3px;height:88px;}
+.btn-power:active{background:#5a5a62;}
+
+.screen{
+  position:relative;width:100%;height:100%;
+  border-radius:44px;overflow:hidden;background:#000;
+  isolation:isolate;
+}
+
+@media (max-width:560px),(max-height:700px){
+  .device{width:100vw;width:100dvw;height:100vh;height:100dvh;aspect-ratio:auto;border-radius:0;padding:0;box-shadow:none;}
+  .screen{border-radius:0;}
+  .btn-silent,.btn-vol,.btn-power{display:none;}
+}
+
+/* ============ WALLPAPER ============ */
+.wallpaper{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(circle at 18% 12%,#7b5cff 0%,transparent 48%),
+    radial-gradient(circle at 85% 8%,#ff4f9a 0%,transparent 45%),
+    radial-gradient(circle at 88% 78%,#00c2ff 0%,transparent 50%),
+    radial-gradient(circle at 8% 88%,#20e3a0 0%,transparent 48%),
+    linear-gradient(160deg,#141428,#0b0b14 70%);
+  transition:filter .25s;
+}
+.wallpaper::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 40%,transparent 30%,rgba(0,0,0,.45) 100%);
+}
+
+/* ============ STATUS BAR ============ */
+.status-bar{
+  position:absolute;top:0;left:0;right:0;height:54px;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 28px 0;font-size:15px;font-weight:600;letter-spacing:.2px;
+  pointer-events:none;text-shadow:0 1px 4px rgba(0,0,0,.35);
+}
+.sb-right{display:flex;align-items:center;gap:6px;}
+.sb-icon{width:17px;height:12px;opacity:.95;}
+.battery{width:25px;height:12.5px;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;padding:1.5px;position:relative;}
+.battery::after{content:'';position:absolute;right:-3.5px;top:3.5px;width:2px;height:4.5px;border-radius:0 2px 2px 0;background:rgba(255,255,255,.5);}
+.battery-fill{height:100%;width:84%;background:#fff;border-radius:2px;}
+
+/* ============ HOME ============ */
+.home{
+  position:absolute;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  padding:66px 20px calc(28px + env(safe-area-inset-bottom));
+  transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .35s ease;
+}
+.home.zoomed{transform:scale(1.14);opacity:0;pointer-events:none;}
+
+.widget{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;border-radius:26px;
+  background:rgba(255,255,255,.13);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+.w-time{font-size:34px;font-weight:300;letter-spacing:-1.5px;line-height:1;}
+.w-date{font-size:12px;opacity:.7;margin-top:7px;font-weight:500;letter-spacing:.3px;}
+.w-right{text-align:right;}
+.w-temp{font-size:32px;font-weight:300;letter-spacing:-1px;line-height:1;}
+.w-city{font-size:12px;opacity:.7;margin-top:7px;font-weight:500;}
+
+.app-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:26px 6px;margin-top:30px;
+}
+.home-spacer{flex:1;}
+
+.app-icon{display:flex;flex-direction:column;align-items:center;gap:8px;animation:pop .4s backwards;}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.icon-tile{
+  width:62px;height:62px;border-radius:18px;
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 7px 18px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.28);
+  transition:transform .16s cubic-bezier(.32,.72,0,1);
+}
+.icon-tile svg{width:32px;height:32px;}
+.app-icon:active .icon-tile{transform:scale(.88);}
+.icon-label{font-size:11.5px;font-weight:500;letter-spacing:.1px;text-shadow:0 1px 4px rgba(0,0,0,.6);opacity:.95;}
+
+.search-pill{
+  align-self:center;margin-bottom:18px;
+  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  display:flex;align-items:center;gap:6px;opacity:.9;
+  transition:transform .15s;
+}
+.search-pill:active{transform:scale(.95);}
+
+.dock{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:14px 10px;border-radius:32px;
+  background:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  backdrop-filter:blur(26px) saturate(180%);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+.dock .app-icon{gap:0;}
+
+/* ============ APP VIEWS ============ */
+.app-view{
+  position:absolute;inset:0;z-index:60;display:none;flex-direction:column;
+  background:#0b0b10;overflow:hidden;border-radius:inherit;
+  will-change:transform,opacity;
+  transition:transform .42s cubic-bezier(.32,.72,0,1),opacity .3s ease;
+}
+.app-view.active{display:flex;}
+
+.app-nav{
+  padding:60px 20px 10px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-shrink:0;
+}
+.nav-title{font-size:31px;font-weight:700;letter-spacing:-.8px;}
+.nav-btn{
+  width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);
+  display:grid;place-items:center;flex-shrink:0;transition:background .2s;
+}
+.nav-btn:active{background:rgba(255,255,255,.22);}
+.nav-btn svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+.app-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 16px 44px;}
+
+.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:14px 16px;margin-bottom:12px;}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.7px;opacity:.5;margin-bottom:10px;text-transform:uppercase;}
+
+/* ---- Weather ---- */
+.wx-hero{text-align:center;padding:14px 0 26px;}
+.wx-city{font-size:19px;font-weight:600;opacity:.92;}
+.wx-temp{font-size:88px;font-weight:200;letter-spacing:-5px;line-height:1;margin:2px 0;}
+.wx-desc{font-size:16px;font-weight:500;opacity:.85;}
+.wx-range{font-size:15px;opacity:.6;margin-top:5px;}
+.wx-hours{display:flex;justify-content:space-between;gap:4px;}
+.wx-hour{display:flex;flex-direction:column;align-items:center;gap:9px;font-size:13px;font-weight:600;}
+.wx-hour .ico{font-size:19px;}
+.wx-hour .t{opacity:.6;font-size:11.5px;}
+.wx-day{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:14.5px;font-weight:500;}
+.wx-day .lbl{width:44px;opacity:.8;}
+.wx-day .ico{font-size:17px;width:24px;text-align:center;}
+.wx-day .lo{opacity:.5;width:34px;text-align:right;}
+.wx-day .bar{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.14);position:relative;overflow:hidden;}
+.wx-day .bar span{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4facfe,#ffd166);}
+.wx-day .hi{width:34px;text-align:right;}
+
+/* ---- Calendar ---- */
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:17px;font-weight:600;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;}
+.cal-dow{font-size:10.5px;font-weight:700;opacity:.45;padding:6px 0;letter-spacing:.5px;}
+.cal-cell{
+  aspect-ratio:1;display:grid;place-items:center;font-size:14.5px;font-weight:500;border-radius:50%;
+  position:relative;
+}
+.cal-cell.today{background:linear-gradient(160deg,#ff5f6d,#ff2d55);font-weight:700;}
+.cal-cell.dim{opacity:.22;}
+.cal-cell .dot{position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:#0a84ff;}
+
+/* ---- Photos ---- */
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:2px;}
+.photo-tile{aspect-ratio:1;border-radius:5px;transition:transform .15s;}
+.photo-tile:active{transform:scale(.95);}
+
+/* ---- Notes ---- */
+.note-item{
+  background:rgba(255,255,255,.07);border-radius:16px;padding:13px 16px;margin-bottom:9px;
+  transition:background .15s;
+}
+.note-item:active{background:rgba(255,255,255,.14);}
+.note-item h4{margin:0 0 4px;font-size:15px;font-weight:600;}
+.note-item p{margin:0;font-size:12.5px;opacity:.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.note-editor{display:flex;flex-direction:column;flex:1;padding:0 20px 20px;}
+.note-editor input{background:none;border:0;color:#fff;font-size:24px;font-weight:700;outline:none;padding:8px 0;}
+.note-editor textarea{
+  flex:1;background:none;border:0;color:#fff;font-size:15.5px;line-height:1.6;outline:none;resize:none;
+  font-family:inherit;padding:8px 0;
+}
+
+/* ---- Calculator ---- */
+.calc{flex:1;display:flex;flex-direction:column;padding:0 14px 26px;}
+.calc-display{
+  flex:1;display:flex;align-items:flex-end;justify-content:flex-end;
+  font-size:76px;font-weight:200;letter-spacing:-3px;padding:0 12px 20px;
+  overflow:hidden;white-space:nowrap;
+}
+.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.calc-key{
+  aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  font-size:27px;font-weight:500;background:rgba(255,255,255,.13);
+  transition:filter .12s,transform .08s;
+}
+.calc-key:active{filter:brightness(1.5);transform:scale(.96);}
+.calc-key.fn{background:rgba(255,255,255,.28);color:#0b0b10;font-weight:600;}
+.calc-key.op{background:linear-gradient(160deg,#ffa726,#ff8c00);color:#fff;font-weight:600;}
+.calc-key.wide{grid-column:span 2;aspect-ratio:auto;border-radius:40px;justify-content:flex-start;padding-left:32px;}
+
+/* ---- Clock ---- */
+.clock-big{text-align:center;padding:26px 0 30px;}
+.clock-big .t{font-size:66px;font-weight:200;letter-spacing:-3px;line-height:1;}
+.clock-big .d{font-size:14px;opacity:.55;margin-top:10px;font-weight:500;}
+.world-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+.world-row:last-child{border:0;}
+.world-row .n{font-size:15px;font-weight:500;}
+.world-row .s{font-size:11.5px;opacity:.45;margin-top:2px;}
+.world-row .tm{font-size:23px;font-weight:300;letter-spacing:-.5px;}
+
+/* ---- Music ---- */
+.music-wrap{flex:1;display:flex;flex-direction:column;padding:0 30px 30px;}
+.album{
+  aspect-ratio:1;border-radius:22px;margin:10px 0 26px;
+  background:linear-gradient(135deg,#ff5e7d,#7b5cff 55%,#00c2ff);
+  box-shadow:0 24px 60px rgba(123,92,255,.35);
+  display:grid;place-items:center;position:relative;overflow:hidden;
+}
+.album::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.35),transparent 55%);}
+.album svg{width:70px;height:70px;opacity:.85;z-index:1;}
+.m-title{font-size:21px;font-weight:700;letter-spacing:-.3px;}
+.m-artist{font-size:14.5px;opacity:.5;margin-top:4px;}
+.progress{height:5px;border-radius:3px;background:rgba(255,255,255,.16);margin:24px 0 8px;overflow:hidden;}
+.progress > div{height:100%;width:32%;background:#fff;border-radius:3px;}
+.times{display:flex;justify-content:space-between;font-size:11.5px;opacity:.45;font-weight:500;}
+.m-controls{display:flex;justify-content:center;align-items:center;gap:36px;margin-top:26px;}
+.m-btn{display:grid;place-items:center;transition:transform .12s;}
+.m-btn:active{transform:scale(.88);}
+.m-btn svg{width:28px;height:28px;fill:#fff;}
+.m-play{width:66px;height:66px;border-radius:50%;background:#fff;display:grid;place-items:center;}
+.m-play svg{width:26px;height:26px;fill:#0b0b10;}
+
+/* ---- Settings ---- */
+.set-group{background:rgba(255,255,255,.07);border-radius:16px;margin-bottom:16px;overflow:hidden;}
+.set-row{display:flex;align-items:center;gap:13px;padding:13px 15px;border-bottom:1px solid rgba(255,255,255,.06);}
+.set-row:last-child{border:0;}
+.set-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;}
+.set-ico svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.set-name{flex:1;font-size:15px;font-weight:500;}
+.set-val{font-size:13.5px;opacity:.45;}
+.toggle{width:48px;height:29px;border-radius:15px;background:rgba(255,255,255,.16);position:relative;transition:background .25s;flex-shrink:0;}
+.toggle::after{content:'';position:absolute;top:2.5px;left:2.5px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.32,.72,0,1);box-shadow:0 2px 5px rgba(0,0,0,.3);}
+.toggle.on{background:#30d158;}
+.toggle.on::after{transform:translateX(19px);}
+.wall-picker{display:flex;gap:9px;padding:14px 15px;}
+.wall-swatch{width:46px;height:64px;border-radius:11px;border:2px solid transparent;transition:transform .15s;}
+.wall-swatch:active{transform:scale(.93);}
+.wall-swatch.sel{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.35);}
+
+/* ---- Messages ---- */
+.msg-item{display:flex;gap:12px;padding:11px 0;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);}
+.msg-item:last-child{border:0;}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:600;flex-shrink:0;}
+.msg-meta{flex:1;min-width:0;}
+.msg-meta .n{font-size:15px;font-weight:600;}
+.msg-meta .p{font-size:13px;opacity:.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.msg-time{font-size:11.5px;opacity:.35;align-self:flex-start;padding-top:3px;}
+.thread{flex:1;display:flex;flex-direction:column;gap:8px;padding:14px 16px 30px;overflow-y:auto;}
+.bubble{max-width:76%;padding:9px 14px;border-radius:19px;font-size:14.5px;line-height:1.4;}
+.bubble.them{background:rgba(255,255,255,.13);align-self:flex-start;border-bottom-left-radius:6px;}
+.bubble.me{background:linear-gradient(160deg,#0a84ff,#0060df);align-self:flex-end;border-bottom-right-radius:6px;}
+
+/* ---- Camera ---- */
+.cam{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;}
+.viewfinder{flex:1;position:relative;background:
+  radial-gradient(circle at 30% 25%,#2a3a5e,#0a0e18 70%),
+  linear-gradient(200deg,#1b2a4a,#080c14);
+  display:grid;place-items:center;}
+.viewfinder .g{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+  background-size:33.33% 33.33%;}
+.viewfinder .focus{width:74px;height:74px;border:1.5px solid rgba(255,255,255,.7);border-radius:8px;}
+.cam-bar{height:150px;display:flex;align-items:center;justify-content:center;position:relative;background:#000;}
+.shutter{width:72px;height:72px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.3);background-clip:padding-box;transition:transform .1s;}
+.shutter:active{transform:scale(.9);}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:99;}
+.flash.go{animation:flashAnim .4s;}
+@keyframes flashAnim{0%{opacity:.95}100%{opacity:0}}
+
+/* ---- Files ---- */
+.file-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.file-row:last-child{border:0;}
+.file-ico{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;}
+.file-ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.file-name{font-size:15px;font-weight:500;}
+.file-sub{font-size:12px;opacity:.42;margin-top:2px;}
+
+/* ---- Maps ---- */
+.map{flex:1;position:relative;overflow:hidden;background:#101c16;}
+.map-grid{position:absolute;inset:-50%;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(90,200,140,.16) 0 1px,transparent 1px 74px),
+    repeating-linear-gradient(90deg,rgba(90,200,140,.16) 0 1px,transparent 1px 74px),
+    repeating-linear-gradient(38deg,rgba(255,255,255,.07) 0 2px,transparent 2px 180px);
+}
+.map-river{position:absolute;top:-20%;left:38%;width:58px;height:140%;background:linear-gradient(180deg,rgba(60,150,220,.35),rgba(60,150,220,.18));transform:rotate(11deg);filter:blur(1px);}
+.map-pin{position:absolute;top:44%;left:50%;transform:translate(-50%,-100%);text-align:center;}
+.map-pin .dot{width:18px;height:18px;border-radius:50%;background:#0a84ff;border:3px solid #fff;box-shadow:0 0 0 6px rgba(10,132,255,.25),0 6px 16px rgba(0,0,0,.5);margin:0 auto;}
+.map-pin .lbl{margin-top:8px;font-size:12px;font-weight:600;background:rgba(0,0,0,.6);padding:4px 10px;border-radius:10px;white-space:nowrap;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.map-search{position:absolute;top:14px;left:14px;right:14px;padding:11px 16px;border-radius:14px;background:rgba(20,20,26,.78);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);font-size:14px;opacity:.85;border:1px solid rgba(255,255,255,.1);}
+
+/* ============ LOCK SCREEN ============ */
+.lockscreen{
+  position:absolute;inset:0;z-index:400;
+  display:flex;flex-direction:column;align-items:center;
+  padding:74px 26px 44px;
+  background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55));
+  transition:transform .5s cubic-bezier(.32,.72,0,1),opacity .35s ease;
+  will-change:transform;
+}
+.lockscreen.unlocked{transform:translateY(-100%);opacity:0;pointer-events:none;}
+.lock-icon{margin-bottom:8px;opacity:.85;}
+.lock-icon svg{width:19px;height:19px;fill:#fff;}
+.lock-time{font-size:86px;font-weight:200;letter-spacing:-4px;line-height:1;margin-top:2px;}
+.lock-date{font-size:15px;font-weight:500;opacity:.8;margin-top:6px;letter-spacing:.2px;}
+.lock-widgets{display:flex;gap:10px;margin-top:30px;width:100%;}
+.lock-w{flex:1;padding:12px 14px;border-radius:20px;background:rgba(255,255,255,.13);
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;}
+.lock-w .em{font-size:22px;}
+.lock-w .tx{font-size:12px;opacity:.6;font-weight:500;}
+.lock-w .vl{font-size:16px;font-weight:600;margin-top:1px;}
+.lock-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:26px;width:100%;}
+.lock-actions{display:flex;justify-content:space-between;width:100%;padding:0 14px;}
+.lock-action{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  display:grid;place-items:center;transition:transform .15s,background .15s;}
+.lock-action:active{transform:scale(.9);background:rgba(255,255,255,.3);}
+.lock-action svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.unlock-hint{font-size:13px;opacity:.65;font-weight:500;letter-spacing:.3px;animation:bob 2.2s ease-in-out infinite;display:flex;flex-direction:column;align-items:center;gap:6px;}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-6px);opacity:.95}}
+.unlock-hint svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============ PANELS ============ */
+.scrim{position:absolute;inset:0;z-index:280;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .35s;}
+.scrim.show{opacity:1;pointer-events:auto;}
+
+.panel{
+  position:absolute;left:0;right:0;top:0;z-index:300;
+  padding:58px 14px 20px;
+  background:rgba(20,20,26,.78);
+  -webkit-backdrop-filter:blur(34px) saturate(180%);
+  backdrop-filter:blur(34px) saturate(180%);
+  border-radius:0 0 40px 40px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  transform:translateY(-115%);
+  transition:transform .45s cubic-bezier(.32,.72,0,1);
+  max-height:86%;overflow-y:auto;
+}
+.panel.open{transform:translateY(0);}
+
+.cc-row{display:flex;gap:11px;margin-bottom:11px;}
+.cc-card{background:rgba(255,255,255,.1);border-radius:22px;padding:14px;border:1px solid rgba(255,255,255,.07);}
+.cc-toggles{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;}
+.cc-round{
+  width:100%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.13);
+  display:grid;place-items:center;transition:background .25s,transform .12s;
+}
+.cc-round:active{transform:scale(.93);}
+.cc-round.on{background:linear-gradient(160deg,#3fa9ff,#0a6cf1);}
+.cc-round svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+
+.slider{position:relative;height:64px;border-radius:20px;background:rgba(255,255,255,.13);overflow:hidden;touch-action:none;}
+.slider-fill{position:absolute;top:0;left:0;bottom:0;width:65%;background:rgba(255,255,255,.92);transition:width .05s linear;}
+.slider-ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:2;mix-blend-mode:difference;}
+.slider-ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.slider-lbl{position:absolute;left:48px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;color:#0b0b10;z-index:2;mix-blend-mode:difference;}
+
+.notif{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:13px 15px;margin-bottom:10px;display:flex;gap:12px;}
+.notif .ni{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;}
+.notif .ni svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.notif .nt{font-size:13.5px;font-weight:600;display:flex;justify-content:space-between;}
+.notif .nt span{font-weight:400;opacity:.45;font-size:11.5px;}
+.notif .nb{font-size:13px;opacity:.72;margin-top:3px;line-height:1.35;}
+
+.panel-title{font-size:12px;font-weight:700;letter-spacing:.8px;opacity:.45;padding:0 6px 12px;text-transform:uppercase;}
+
+/* ============ HOME INDICATOR / EDGE ============ */
+.home-indicator{
+  position:absolute;bottom:9px;left:50%;transform:translateX(-50%);
+  width:138px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);
+  z-index:500;cursor:pointer;transition:opacity .3s,background .2s;
+}
+.home-indicator:active{background:#fff;}
+.edge-zone{position:absolute;top:0;left:0;right:0;height:30px;z-index:250;touch-action:none;}
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="btn-silent"></div>
+  <div class="btn-vol up"></div>
+  <div class="btn-vol down"></div>
+  <div class="btn-power" id="powerBtn"></div>
+
+  <div class="screen" id="screen">
+    <div class="wallpaper" id="wallpaper"></div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <div class="sb-time" id="sbTime">9:41</div>
+      <div class="sb-right">
+        <svg class="sb-icon" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg class="sb-icon" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.6 5.5 8.7a3.7 3.7 0 0 1 5 0L8 11.6zM3.2 6.4a7.3 7.3 0 0 1 9.6 0L11.4 8a5.3 5.3 0 0 0-6.8 0L3.2 6.4zM.8 3.7a10.9 10.9 0 0 1 14.4 0L13.8 5.2a8.9 8.9 0 0 0-11.6 0L.8 3.7z"/></svg>
+        <div class="battery"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="home" id="home">
+      <div class="widget">
+        <div class="w-left">
+          <div class="w-time" id="wgTime">9:41</div>
+          <div class="w-date" id="wgDate">Monday, Jan 1</div>
+        </div>
+        <div class="w-right">
+          <div class="w-temp">72°</div>
+          <div class="w-city">Cupertino</div>
+        </div>
+      </div>
+      <div class="app-grid" id="appGrid"></div>
+      <div class="home-spacer"></div>
+      <div class="search-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        Search
+      </div>
+      <div class="dock" id="dock"></div>
+    </div>
+
+    <!-- APPS -->
+    <div class="app-layer" id="appLayer"></div>
+
+    <!-- LOCK SCREEN -->
+    <div class="lockscreen" id="lockScreen">
+      <div class="lock-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1.5a5 5 0 0 0-5 5V9H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6.5a5 5 0 0 0-5-5zm0 2a3 3 0 0 1 3 3V9H9V6.5a3 3 0 0 1 3-3z"/></svg>
+      </div>
+      <div class="lock-time" id="lockTime">9:41</div>
+      <div class="lock-date" id="lockDate">Monday, January 1</div>
+
+      <div class="lock-widgets">
+        <div class="lock-w">
+          <div class="em">⛅️</div>
+          <div><div class="tx">Cupertino</div><div class="vl">72°</div></div>
+        </div>
+        <div class="lock-w">
+          <div class="em">🔋</div>
+          <div><div class="tx">Battery</div><div class="vl">84%</div></div>
+        </div>
+      </div>
+
+      <div class="lock-bottom">
+        <div class="unlock-hint" id="unlockHint">
+          <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Swipe up to unlock
+        </div>
+        <div class="lock-actions">
+          <button class="lock-action" title="Flashlight">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12l-2 5H8L6 3z"/><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"/><path d="M10.5 13h3"/></svg>
+          </button>
+          <button class="lock-action" title="Camera">
+            <svg viewBox="0 0 24 24"><path d="M4 8.5h3L8.5 6h7l1.5 2.5h3a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 18v-8A1.5 1.5 0 0 1 4 8.5z"/><circle cx="12" cy="13.5" r="3.4"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIM -->
+    <div class="scrim" id="scrim"></div>
+
+    <!-- CONTROL CENTER -->
+    <div class="panel" id="controlCenter">
+      <div class="cc-row">
+        <div class="cc-card" style="flex:1;">
+          <div class="cc-toggles">
+            <button class="cc-round on" data-toggle title="Airplane">
+              <svg viewBox="0 0 24 24"><path d="M12 2.5v6.2l7.5 4.3v2l-7.5-2.2v5.4l2.6 1.9v1.4L12 20.2l-2.6 1.3v-1.4l2.6-1.9v-5.4L4.5 15v-2l7.5-4.3V2.5z"/></svg>
+            </button>
+            <button class="cc-round on" data-toggle title="Wi-Fi">
+              <svg viewBox="0 0 24 24"><path d="M12 18.5h.01"/><path d="M8.8 15.2a4.6 4.6 0 0 1 6.4 0"/><path d="M5.6 11.9a9.1 9.1 0 0 1 12.8 0"/><path d="M2.4 8.6a13.6 13.6 0 0 1 19.2 0"/></svg>
+            </button>
+            <button class="cc-round" data-toggle title="Bluetooth">
+              <svg viewBox="0 0 24 24"><path d="M7 7.5 17 16.5 12 21V3l5 4.5L7 16.5"/></svg>
+            </button>
+            <button class="cc-round on" data-toggle title="Cellular">
+              <svg viewBox="0 0 24 24"><path d="M4 19v-3M9 19v-6M14 19v-9M19 19V7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cc-card" style="width:calc(50% - 5.5px);display:flex;flex-direction:column;gap:10px;">
+          <button class="cc-round on" data-toggle style="aspect-ratio:auto;height:56px;" title="Do Not Disturb">
+            <svg viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+          </button>
+          <button class="cc-round" data-toggle style="aspect-ratio:auto;height:56px;" title="Screen Mirroring">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M8.5 21h7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="cc-card" style="padding:0;background:none;border:0;margin-bottom:11px;">
+        <div class="slider" data-slider="brightness">
+          <div class="slider-fill" style="width:78%"></div>
+          <div class="slider-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="cc-card" style="padding:0;background:none;border:0;margin-bottom:11px;">
+        <div class="slider" data-slider="volume">
+          <div class="slider-fill" style="width:48%"></div>
+          <div class="slider-ico"><svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.8 6.2a8 8 0 0 1 0 11.6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="cc-row" style="margin-bottom:0;">
+        <button class="cc-round" style="aspect-ratio:auto;height:62px;border-radius:20px;" title="Flashlight">
+          <svg viewBox="0 0 24 24"><path d="M6 3h12l-2 5H8L6 3z"/><path d="M8 8v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V8"/></svg>
+        </button>
+        <button class="cc-round" style="aspect-ratio:auto;height:62px;border-radius:20px;" title="Timer">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2.5h6"/></svg>
+        </button>
+        <button class="cc-round" style="aspect-ratio:auto;height:62px;border-radius:20px;" title="Calculator">
+          <svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="4"/><path d="M8 7.5h8"/></svg>
+        </button>
+        <button class="cc-round" style="aspect-ratio:auto;height:62px;border-radius:20px;" id="lockBtn" title="Lock">
+          <svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="panel" id="notifCenter">
+      <div class="panel-title">Notifications</div>
+
+      <div class="notif">
+        <div class="ni" style="background:linear-gradient(160deg,#5ef07a,#12b93a)">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.4-5A8.5 8.5 0 1 1 21 11.5z"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="nt">Messages <span>now</span></div>
+          <div class="nb">Sarah: Are we still on for dinner at 7?</div>
+        </div>
+      </div>
+
+      <div class="notif">
+        <div class="ni" style="background:linear-gradient(160deg,#4ab8ff,#0a63e8)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="nt">Clock <span>12m ago</span></div>
+          <div class="nb">Alarm set for 7:00 AM tomorrow.</div>
+        </div>
+      </div>
+
+      <div class="notif">
+        <div class="ni" style="background:linear-gradient(160deg,#ffd95e,#ffb302)">
+          <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="nt">Notes <span>1h ago</span></div>
+          <div class="nb">Shopping list updated — 3 items added.</div>
+        </div>
+      </div>
+
+      <div class="notif">
+        <div class="ni" style="background:linear-gradient(160deg,#ff5e7d,#f5214c)">
+          <svg viewBox="0 0 24 24"><path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="nt">Music <span>2h ago</span></div>
+          <div class="nb">New release from your favorite artist is out now.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="edge-zone" id="edgeZone"></div>
+    <div class="home-indicator" id="homeIndicator"></div>
+  </div>
+</div>
+
+<script>
+/* ==================================================================
+   NOVA OS
+   ================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+const screenEl = $('#screen');
+const homeEl = $('#home');
+const lockEl = $('#lockScreen');
+const appLayer = $('#appLayer');
+
+/* ---------------- ICONS ---------------- */
+const I = {
+  weather: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.2" cy="8.2" r="3"/><path d="M8.2 2.4v1.5M8.2 12.5v1.5M2.4 8.2h1.5M12.5 8.2h1.5M4.1 4.1l1.1 1.1M11.2 11.2l1.1 1.1M4.1 12.3l1.1-1.1M11.2 5.1l1.1-1.1"/><path d="M20.2 18.6a3.2 3.2 0 0 0-1.2-6.2 4.4 4.4 0 0 0-8.3 1.2 3 3 0 0 0 .6 5h8.9z"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`,
+  photos: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></svg>`,
+  notes: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>`,
+  calculator: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.5" width="16" height="19" rx="4"/><path d="M8 7.5h8"/><path d="M8.5 12.5v.01M12 12.5v.01M15.5 12.5v.01M8.5 16.5v.01M12 16.5v.01M15.5 16.5v.01"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></svg>`,
+  music: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9M18 7h2M4 17h4M12 17h8"/><circle cx="15.5" cy="7" r="2.4"/><circle cx="9.5" cy="17" r="2.4"/></svg>`,
+  messages: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.4-5A8.5 8.5 0 1 1 21 11.5z"/></svg>`,
+  camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h3L8.5 6h7l1.5 2.5h3a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 18v-8A1.5 1.5 0 0 1 4 8.5z"/><circle cx="12" cy="13.5" r="3.4"/></svg>`,
+  files: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9.5z"/></svg>`,
+  maps: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>`
+};
+
+/* ---------------- APP DEFINITIONS ---------------- */
+const APPS = {
+  weather:    { name: 'Weather',    grad: 'linear-gradient(160deg,#4ab8ff,#0a63e8)', svg: I.weather,    color: '#fff' },
+  calendar:   { name: 'Calendar',   grad: 'linear-gradient(160deg,#ffffff,#dcdce4)', svg: I.calendar,   color: '#ff3b30' },
+  photos:     { name: 'Photos',     grad: 'conic-gradient(from 210deg,#ff5f6d,#ffc371,#47e891,#38b6ff,#a06bff,#ff5f6d)', svg: I.photos, color: '#fff' },
+  notes:      { name: 'Notes',      grad: 'linear-gradient(160deg,#ffd95e,#ffb302)', svg: I.notes,      color: '#fff' },
+  calculator: { name: 'Calculator', grad: 'linear-gradient(160deg,#4a4a50,#1c1c1e)', svg: I.calculator, color: '#fff' },
+  clock:      { name: 'Clock',      grad: 'linear-gradient(160deg,#2c2c30,#0a0a0c)', svg: I.clock,      color: '#fff' },
+  music:      { name: 'Music',      grad: 'linear-gradient(160deg,#ff5e7d,#f5214c)', svg: I.music,      color: '#fff' },
+  settings:   { name: 'Settings',   grad: 'linear-gradient(160deg,#8e8e93,#4a4a50)', svg: I.settings,   color: '#fff' },
+  messages:   { name: 'Messages',   grad: 'linear-gradient(160deg,#5ef07a,#12b93a)', svg: I.messages,   color: '#fff' },
+  camera:     { name: 'Camera',     grad: 'linear-gradient(160deg,#5c5c62,#2a2a2e)', svg: I.camera,     color: '#fff' },
+  files:      { name: 'Files',      grad: 'linear-gradient(160deg,#4fc3ff,#0a84ff)', svg: I.files,      color: '#fff' },
+  maps:       { name: 'Maps',       grad: 'linear-gradient(160deg,#7ee8a3,#2bb673)', svg: I.maps,       color: '#fff' }
+};
+
+const GRID_APPS = ['weather', 'calendar', 'notes', 'calculator', 'clock', 'settings', 'files', 'maps'];
+const DOCK_APPS = ['messages', 'camera', 'photos', 'music'];
+
+/* ---------------- STATE ---------------- */
+const state = { openApp: null, locked: true, panel: null };
+
+const notesData = [
+  { title: 'Product ideas', body: '1. Dark mode everywhere\n2. Gesture-based navigation\n3. Widgets on the lock screen\n4. Live activities for deliveries' },
+  { title: 'Groceries', body: 'Oat milk\nSourdough\nAvocados\nCoffee beans\nBlueberries' },
+  { title: 'Weekend plan', body: 'Sat — hike at Rancho San Antonio\nSun — brunch with Sarah, then the design museum' }
+];
+
+const chats = [
+  { name: 'Sarah', color: 'linear-gradient(160deg,#ff9a9e,#f6416c)', letter: 'S', time: '9:41', last: 'Are we still on for dinner at 7?', msgs: [
+      { me: false, t: 'Hey! Just landed ✈️' },
+      { me: true, t: 'Nice, how was the flight?' },
+      { me: false, t: 'Smooth. Slightly tired though' },
+      { me: false, t: 'Are we still on for dinner at 7?' }
+    ] },
+  { name: 'Design Team', color: 'linear-gradient(160deg,#667eea,#764ba2)', letter: 'D', time: '8:12', last: 'Maya: pushed the new mockups', msgs: [
+      { me: false, t: 'Maya: pushed the new mockups' },
+      { me: true, t: 'Looking at them now — the type scale feels great' },
+      { me: false, t: 'Maya: thanks! still tweaking the dark theme' }
+    ] },
+  { name: 'Alex Chen', color: 'linear-gradient(160deg,#43e97b,#38f9d7)', letter: 'A', time: 'Yesterday', last: 'Sent you the file 📎', msgs: [
+      { me: false, t: 'Sent you the file 📎' },
+      { me: true, t: 'Got it, thanks!' }
+    ] },
+  { name: 'Mom', color: 'linear-gradient(160deg,#f6d365,#fda085)', letter: 'M', time: 'Yesterday', last: 'Call me when you can ❤️', msgs: [
+      { me: false, t: 'Call me when you can ❤️' },
+      { me: true, t: 'Will do after work!' }
+    ] },
+  { name: 'Running Club', color: 'linear-gradient(160deg,#a1c4fd,#c2e9fb)', letter: 'R', time: 'Tue', last: 'Sam: 6am tomorrow, who is in?', msgs: [
+      { me: false, t: 'Sam: 6am tomorrow, who is in?' },
+      { me: true, t: 'In 🏃' }
+    ] }
+];
+
+let photos = [
+  'linear-gradient(160deg,#ff9a9e,#fad0c4)',
+  'linear-gradient(160deg,#a1c4fd,#c2e9fb)',
+  'linear-gradient(160deg,#fbc2eb,#a6c1ee)',
+  'linear-gradient(160deg,#84fab0,#8fd3f4)',
+  'linear-gradient(160deg,#ffecd2,#fcb69f)',
+  'linear-gradient(160deg,#d4fc79,#96e6a1)',
+  'linear-gradient(160deg,#f093fb,#f5576c)',
+  'linear-gradient(160deg,#4facfe,#00f2fe)',
+  'linear-gradient(160deg,#43e97b,#38f9d7)',
+  'linear-gradient(160deg,#fa709a,#fee140)',
+  'linear-gradient(160deg,#30cfd0,#330867)',
+  'linear-gradient(160deg,#5ee7df,#b490ca)'
+];
+
+const WALLS = [
+  'radial-gradient(circle at 18% 12%,#7b5cff 0%,transparent 48%),radial-gradient(circle at 85% 8%,#ff4f9a 0%,transparent 45%),radial-gradient(circle at 88% 78%,#00c2ff 0%,transparent 50%),radial-gradient(circle at 8% 88%,#20e3a0 0%,transparent 48%),linear-gradient(160deg,#141428,#0b0b14 70%)',
+  'radial-gradient(circle at 25% 20%,#ff9a3c 0%,transparent 50%),radial-gradient(circle at 80% 25%,#ff2d55 0%,transparent 45%),radial-gradient(circle at 70% 85%,#7b5cff 0%,transparent 55%),linear-gradient(160deg,#2a0f1c,#0d0509 70%)',
+  'radial-gradient(circle at 20% 15%,#00d4ff 0%,transparent 50%),radial-gradient(circle at 82% 18%,#0066ff 0%,transparent 48%),radial-gradient(circle at 50% 90%,#00e0a0 0%,transparent 55%),linear-gradient(160deg,#071523,#03080f 70%)',
+  'radial-gradient(circle at 70% 15%,#f5f7fa 0%,transparent 40%),radial-gradient(circle at 20% 80%,#c3cfe2 0%,transparent 50%),linear-gradient(160deg,#434343,#0a0a0a 70%)',
+  'radial-gradient(circle at 30% 25%,#ff6a00 0%,transparent 48%),radial-gradient(circle at 78% 70%,#ee0979 0%,transparent 50%),linear-gradient(160deg,#1a0a14,#08040a 70%)'
+];
+
+/* ==================================================================
+   HOME RENDERING
+   ================================================================== */
+function makeIcon(id, withLabel) {
+  const app = APPS[id];
+  const b = document.createElement('button');
+  b.className = 'app-icon';
+  b.dataset.app = id;
+  b.innerHTML = `<div class="icon-tile" style="background:${app.grad};color:${app.color}">${app.svg}</div>` +
+    (withLabel ? `<span class="icon-label">${app.name}</span>` : '');
+  b.addEventListener('click', () => openApp(id, b.querySelector('.icon-tile')));
+  return b;
+}
+
+const appGrid = $('#appGrid');
+const dock = $('#dock');
+GRID_APPS.forEach((id, i) => {
+  const el = makeIcon(id, true);
+  el.style.animationDelay = (i * 30) + 'ms';
+  appGrid.appendChild(el);
+});
+DOCK_APPS.forEach(id => dock.appendChild(makeIcon(id, false)));
+
+/* ==================================================================
+   TIME
+   ================================================================== */
+function fmtTime(d) {
+  const h = d.getHours() % 12 || 12;
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}
+function fmtDate(d) {
+  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+}
+function fmtDateShort(d) {
+  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function tick() {
+  const now = new Date();
+  $('#sbTime').textContent = fmtTime(now);
+  $('#lockTime').textContent = fmtTime(now);
+  $('#lockDate').textContent = fmtDate(now);
+  $('#wgTime').textContent = fmtTime(now);
+  $('#wgDate').textContent = fmtDateShort(now);
+
+  const ct = $('#clockAppTime');
+  if (ct) {
+    ct.textContent = fmtTime(now) + ':' + String(now.getSeconds()).padStart(2, '0');
+    $('#clockAppDate').textContent = fmtDate(now);
+  }
+  $$('.world-tm').forEach(el => {
+    const off = parseInt(el.dataset.off, 10);
+    const d2 = new Date(now.getTime() + off * 3600 * 1000);
+    el.textContent = fmtTime(d2);
+  });
+}
+setInterval(tick, 1000);
+tick();
+
+/* ==================================================================
+   APP CONTENT BUILDERS
+   ================================================================== */
+const BUILD = {
+
+  /* ---------- WEATHER ---------- */
+  weather() {
+    const hours = [
+      ['Now', '☀️', '72°'], ['1PM', '☀️', '74°'], ['2PM', '⛅️', '75°'],
+      ['3PM', '⛅️', '76°'], ['4PM', '☁️', '74°'], ['5PM', '🌤', '71°']
+    ].map(h => `<div class="wx-hour"><span class="t">${h[0]}</span><span class="ico">${h[1]}</span><span>${h[2]}</span></div>`).join('');
+
+    const days = [
+      ['Today', '☀️', 58, 78, 30, 92], ['Tue', '⛅️', 57, 74, 40, 85], ['Wed', '☁️', 55, 70, 45, 80],
+      ['Thu', '🌧', 54, 66, 55, 70], ['Fri', '🌧', 53, 64, 50, 65], ['Sat', '⛅️', 56, 71, 42, 82],
+      ['Sun', '☀️', 59, 77, 35, 90]
+    ].map(d => `
+      <div class="wx-day">
+        <span class="lbl">${d[0]}</span>
+        <span class="ico">${d[1]}</span>
+        <span class="lo">${d[2]}°</span>
+        <span class="bar"><span style="left:${d[4] - 30}%;width:${d[5] - d[4] + 22}%"></span></span>
+        <span class="hi">${d[3]}°</span>
+      </div>`).join('');
+
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1;background:linear-gradient(180deg,#13315c 0%,#0b1220 55%,#070a12 100%)">
+        <div class="app-nav"><div class="nav-title">Weather</div></div>
+        <div class="app-scroll">
+          <div class="wx-hero">
+            <div class="wx-city">Cupertino</div>
+            <div class="wx-temp">72°</div>
+            <div class="wx-desc">Mostly Sunny</div>
+            <div class="wx-range">H:78°  L:58°</div>
+          </div>
+          <div class="card"><div class="card-label">Hourly forecast</div><div class="wx-hours">${hours}</div></div>
+          <div class="card"><div class="card-label">7-day forecast</div>${days}</div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- CALENDAR ---------- */
+  calendar() {
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const firstDow = new Date(y, m, 1).getDay();
+    const total = new Date(y, m + 1, 0).getDate();
+    const prevTotal = new Date(y, m, 0).getDate();
+    const monthName = now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+    let cells = '';
+    for (let i = firstDow - 1; i >= 0; i--) cells += `<div class="cal-cell dim">${prevTotal - i}</div>`;
+    for (let d = 1; d <= total; d++) {
+      const isToday = d === now.getDate();
+      const hasDot = [3, 8, 14, 22, 27].includes(d);
+      cells += `<div class="cal-cell${isToday ? ' today' : ''}">${d}${hasDot ? '<span class="dot"></span>' : ''}</div>`;
+    }
+    const rest = (7 - ((firstDow + total) % 7)) % 7;
+    for (let i = 1; i <= rest; i++) cells += `<div class="cal-cell dim">${i}</div>`;
+
+    const dows = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav"><div class="nav-title">Calendar</div></div>
+        <div class="app-scroll">
+          <div class="card" style="padding:18px 14px;">
+            <div class="cal-head"><span>${monthName}</span></div>
+            <div class="cal-grid">${dows}${cells}</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Today</div>
+            <div class="wx-day"><span class="lbl" style="width:60px;opacity:.6">9:30</span><span style="flex:1">Design review</span></div>
+            <div class="wx-day"><span class="lbl" style="width:60px;opacity:.6">13:00</span><span style="flex:1">Lunch with Sarah</span></div>
+            <div class="wx-day"><span class="lbl" style="width:60px;opacity:.6">18:30</span><span style="flex:1">Gym session</span></div>
+          </div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- PHOTOS ---------- */
+  photos() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav"><div class="nav-title">Photos</div></div>
+        <div class="app-scroll" style="padding:6px 4px 44px;">
+          <div class="photos-grid" id="photosGrid"></div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- NOTES ---------- */
+  notes() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav">
+          <div class="nav-title">Notes</div>
+          <button class="nav-btn" id="newNote"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="app-scroll" id="notesList"></div>
+        <div class="note-editor" id="noteEditor" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;padding-top:8px;">
+            <button class="nav-btn" id="noteBack"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span style="font-size:14px;opacity:.5;">Notes</span>
+          </div>
+          <input id="noteTitle" placeholder="Title">
+          <textarea id="noteBody" placeholder="Start writing…"></textarea>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- CALCULATOR ---------- */
+  calculator() {
+    const keys = [
+      ['AC', 'fn'], ['±', 'fn'], ['%', 'fn'], ['÷', 'op'],
+      ['7', ''], ['8', ''], ['9', ''], ['×', 'op'],
+      ['4', ''], ['5', ''], ['6', ''], ['−', 'op'],
+      ['1', ''], ['2', ''], ['3', ''], ['+', 'op'],
+      ['0', 'wide'], ['.', ''], ['=', 'op']
+    ].map(k => `<button class="calc-key ${k[1]}" data-k="${k[0]}">${k[0]}</button>`).join('');
+
+    return `
+      <div class="app-view-inner calc" style="flex:1;display:flex;flex-direction:column;padding-top:60px;">
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-keys">${keys}</div>
+      </div>`;
+  },
+
+  /* ---------- CLOCK ---------- */
+  clock() {
+    const zones = [
+      ['Cupertino', 'Today', 0], ['New York', 'Today', 3], ['London', 'Today', 8],
+      ['Tokyo', 'Tomorrow', 16], ['Sydney', 'Tomorrow', 18]
+    ].map(z => `
+      <div class="world-row">
+        <div><div class="n">${z[0]}</div><div class="s">${z[1]}</div></div>
+        <div class="tm world-tm" data-off="${z[2]}">--:--</div>
+      </div>`).join('');
+
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav"><div class="nav-title">Clock</div></div>
+        <div class="app-scroll">
+          <div class="clock-big">
+            <div class="t" id="clockAppTime">--:--:--</div>
+            <div class="d" id="clockAppDate">—</div>
+          </div>
+          <div class="card"><div class="card-label">World clock</div>${zones}</div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- MUSIC ---------- */
+  music() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1;background:linear-gradient(180deg,#1a0f22 0%,#0b0b10 60%)">
+        <div class="app-nav"><div class="nav-title">Music</div></div>
+        <div class="music-wrap">
+          <div class="album">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>
+            </svg>
+          </div>
+          <div class="m-title">Midnight City Lights</div>
+          <div class="m-artist">Nova Collective</div>
+          <div class="progress"><div id="mProgress"></div></div>
+          <div class="times"><span id="mCur">1:12</span><span>3:44</span></div>
+          <div class="m-controls">
+            <button class="m-btn"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM18 5v14l-9-7z"/></svg></button>
+            <button class="m-btn m-play" id="mPlay">
+              <svg viewBox="0 0 24 24" id="mPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="m-btn"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM6 5v14l9-7z"/></svg></button>
+          </div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- SETTINGS ---------- */
+  settings() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav"><div class="nav-title">Settings</div></div>
+        <div class="app-scroll">
+          <div class="set-group">
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#3fa9ff,#0a6cf1)"><svg viewBox="0 0 24 24"><path d="M12 18.5h.01"/><path d="M8.8 15.2a4.6 4.6 0 0 1 6.4 0"/><path d="M5.6 11.9a9.1 9.1 0 0 1 12.8 0"/><path d="M2.4 8.6a13.6 13.6 0 0 1 19.2 0"/></svg></div>
+              <div class="set-name">Wi-Fi</div><div class="set-val">Nova-5G</div>
+            </div>
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#5ac8fa,#0a84ff)"><svg viewBox="0 0 24 24"><path d="M7 7.5 17 16.5 12 21V3l5 4.5L7 16.5"/></svg></div>
+              <div class="set-name">Bluetooth</div>
+              <div class="toggle on" data-toggle></div>
+            </div>
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#ff9f0a,#ff6a00)"><svg viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg></div>
+              <div class="set-name">Do Not Disturb</div>
+              <div class="toggle" data-toggle></div>
+            </div>
+          </div>
+
+          <div class="set-group">
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#5ef07a,#12b93a)"><svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></div>
+              <div class="set-name">Face Unlock</div>
+              <div class="toggle on" data-toggle></div>
+            </div>
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#bf5af2,#8e30d0)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></svg></div>
+              <div class="set-name">Always On Display</div>
+              <div class="toggle on" data-toggle></div>
+            </div>
+            <div class="set-row">
+              <div class="set-ico" style="background:linear-gradient(160deg,#ff453a,#c11c14)"><svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg></div>
+              <div class="set-name">Sounds</div><div class="set-val">On</div>
+            </div>
+          </div>
+
+          <div class="set-group">
+            <div class="card-label" style="padding:14px 15px 0;margin:0;">Wallpaper</div>
+            <div class="wall-picker" id="wallPicker">
+              ${WALLS.map((w, i) => `<div class="wall-swatch${i === 0 ? ' sel' : ''}" data-wall="${i}" style="background:${w};background-size:cover;"></div>`).join('')}
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:12px;opacity:.35;padding:14px 0 20px;">Nova OS · Version 1.0</div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- MESSAGES ---------- */
+  messages() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav">
+          <div class="nav-title" id="msgTitle">Messages</div>
+          <button class="nav-btn" id="msgBack" style="display:none;"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        </div>
+        <div class="app-scroll" id="msgList"></div>
+        <div class="thread" id="msgThread" style="display:none;"></div>
+      </div>`;
+  },
+
+  /* ---------- CAMERA ---------- */
+  camera() {
+    return `
+      <div class="app-view-inner cam">
+        <div class="viewfinder">
+          <div class="g"></div>
+          <div class="focus"></div>
+          <div class="flash" id="camFlash"></div>
+        </div>
+        <div class="cam-bar"><button class="shutter" id="shutter"></button></div>
+      </div>`;
+  },
+
+  /* ---------- FILES ---------- */
+  files() {
+    const folders = [
+      ['Documents', '24 items', 'linear-gradient(160deg,#4fc3ff,#0a84ff)'],
+      ['Downloads', '8 items', 'linear-gradient(160deg,#5ef07a,#12b93a)'],
+      ['Photos', '1,204 items', 'linear-gradient(160deg,#ffd95e,#ffb302)'],
+      ['Projects', '12 items', 'linear-gradient(160deg,#bf5af2,#8e30d0)'],
+      ['Shared', '3 items', 'linear-gradient(160deg,#ff9f0a,#ff6a00)'],
+      ['Archive', '56 items', 'linear-gradient(160deg,#8e8e93,#4a4a50)']
+    ].map(f => `
+      <div class="file-row">
+        <div class="file-ico" style="background:${f[2]}"><svg viewBox="0 0 24 24"><path d="M3 7.5a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9.5z"/></svg></div>
+        <div><div class="file-name">${f[0]}</div><div class="file-sub">${f[1]}</div></div>
+      </div>`).join('');
+
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1">
+        <div class="app-nav"><div class="nav-title">Files</div></div>
+        <div class="app-scroll">
+          <div class="card" style="padding:6px 16px;">${folders}</div>
+          <div class="card">
+            <div class="card-label">Storage</div>
+            <div style="height:9px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden;display:flex;">
+              <div style="width:32%;background:#0a84ff"></div>
+              <div style="width:18%;background:#5ef07a"></div>
+              <div style="width:12%;background:#ffd95e"></div>
+            </div>
+            <div style="font-size:12px;opacity:.45;margin-top:9px;">62.4 GB of 128 GB used</div>
+          </div>
+        </div>
+      </div>`;
+  },
+
+  /* ---------- MAPS ---------- */
+  maps() {
+    return `
+      <div class="app-view-inner" style="display:flex;flex-direction:column;flex:1;position:relative;">
+        <div class="map">
+          <div class="map-grid"></div>
+          <div class="map-river"></div>
+          <div class="map-search">Search for a place or address</div>
+          <div class="map-pin">
+            <div class="dot"></div>
+            <div class="lbl">Apple Park · Cupertino</div>
+          </div>
+        </div>
+      </div>`;
+  }
+};
+
+/* ==================================================================
+   BUILD ALL APPS
+   ================================================================== */
+const viewEls = {};
+
+Object.keys(APPS).forEach(id => {
+  const el = document.createElement('div');
+  el.className = 'app-view';
+  el.dataset.app = id;
+  el.innerHTML = BUILD[id]();
+  appLayer.appendChild(el);
+  viewEls[id] = el;
+});
+
+/* ==================================================================
+   APP OPEN / CLOSE
+   ================================================================== */
+function openApp(id, originEl) {
+  if (state.openApp) return;
+  const view = viewEls[id];
+  if (!view) return;
+
+  state.openApp = id;
+
+  if (originEl) {
+    const sr = screenEl.getBoundingClientRect();
+    const r = originEl.getBoundingClientRect();
+    const ox = ((r.left + r.width / 2) - sr.left) / sr.width * 100;
+    const oy = ((r.top + r.height / 2) - sr.top) / sr.height * 100;
+    view.style.transformOrigin = `${ox}% ${oy}%`;
+  } else {
+    view.style.transformOrigin = '50% 50%';
+  }
+
+  view.style.transition = 'none';
+  view.style.display = 'flex';
+  view.style.transform = 'scale(0.42)';
+  view.style.opacity = '0';
+  void view.offsetHeight;
+  view.style.transition = '';
+  requestAnimationFrame(() => {
+    view.style.transform = 'scale(1)';
+    view.style.opacity = '1';
+  });
+
+  homeEl.classList.add('zoomed');
+  initApp(id, view);
+}
+
+function closeApp() {
+  const id = state.openApp;
+  if (!id) return;
+  const view = viewEls[id];
+  view.style.transform = 'scale(0.42)';
+  view.style.opacity = '0';
+  homeEl.classList.remove('zoomed');
+  state.openApp = null;
+  setTimeout(() => {
+    if (!view.classList.contains('active')) view.style.display = 'none';
+  }, 420);
+  setTimeout(() => { view.style.display = 'none'; }, 420);
+}
+
+$('#homeIndicator').addEventListener('click', closeApp);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeApp(); });
+
+/* ==================================================================
+   APP INITIALIZERS
+   ================================================================== */
+function initApp(id, view) {
+  if (id === 'photos') initPhotos(view);
+  if (id === 'notes') initNotes(view);
+  if (id === 'calculator') initCalculator(view);
+  if (id === 'settings') initSettings(view);
+  if (id === 'messages') initMessages(view);
+  if (id === 'camera') initCamera(view);
+  if (id === 'music') initMusic(view);
+  if (id === 'clock') tick();
+}
+
+/* ---- PHOTOS ---- */
+let photosInit = false;
+function initPhotos(view) {
+  const grid = view.querySelector('#photosGrid');
+  grid.innerHTML = photos.map(p => `<div class="photo-tile" style="background:${p}"></div>`).join('');
+}
+
+/* ---- NOTES ---- */
+function initNotes(view) {
+  const list = view.querySelector('#notesList');
+  const editor = view.querySelector('#noteEditor');
+  const titleInput = view.querySelector('#noteTitle');
+  const bodyInput = view.querySelector('#noteBody');
+  let editingIndex = -1;
+
+  function renderList() {
+    list.innerHTML = notesData.map((n, i) => `
+      <div class="note-item" data-i="${i}">
+        <h4>${n.title || 'New Note'}</h4>
+        <p>${(n.body || 'No additional text').replace(/\n/g, ' ')}</p>
+      </div>`).join('');
+    list.querySelectorAll('.note-item').forEach(el => {
+      el.addEventListener('click', () => openEditor(parseInt(el.dataset.i, 10)));
+    });
+  }
+
+  function openEditor(i) {
+    editingIndex = i;
+    const n = notesData[i];
+    titleInput.value = n ? n.title : '';
+    bodyInput.value = n ? n.body : '';
+    list.style.display = 'none';
+    editor.style.display = 'flex';
+    titleInput.focus();
+  }
+
+  function closeEditor() {
+    if (editingIndex >= 0) {
+      const t = titleInput.value.trim();
+      const b = bodyInput.value;
+      if (t || b) notesData[editingIndex] = { title: t, body: b };
+      else notesData.splice(editingIndex, 1);
+    }
+    editingIndex = -1;
+    editor.style.display = 'none';
+    list.style.display = 'block';
+    renderList();
+  }
+
+  view.querySelector('#noteBack').addEventListener('click', closeEditor);
+  view.querySelector('#newNote').addEventListener('click', () => {
+    notesData.unshift({ title: '', body: '' });
+    openEditor(0);
+  });
+  titleInput.addEventListener('blur', () => {});
+  bodyInput.addEventListener('blur', () => {});
+
+  renderList();
+}
+
+/* ---- CALCULATOR ---- */
+function initCalculator(view) {
+  const display = view.querySelector('#calcDisplay');
+  let cur = '0', prev = null, op = null, fresh = true;
+
+  function show() {
+    let out = cur;
+    if (out.length > 9 && !out.includes('e')) {
+      const num = parseFloat(out);
+      out = Math.abs(num) >= 1e9 ? num.toExponential(4) : String(parseFloat(num.toFixed(6)));
+    }
+    display.textContent = out;
+    const len = out.length;
+    display.style.fontSize = len > 8 ? '48px' : len > 6 ? '60px' : '76px';
+  }
+
+  function compute(a, b, o) {
+    switch (o) {
+      case '+': return a + b;
+      case '−': return a - b;
+      case '×': return a * b;
+      case '÷': return b === 0 ? 0 : a / b;
+      default: return b;
+    }
+  }
+
+  view.querySelectorAll('.calc-key').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.dataset.k;
+
+      if (k === 'AC') { cur = '0'; prev = null; op = null; fresh = true; show(); return; }
+      if (k === '±') { cur = String(parseFloat(cur) * -1); show(); return; }
+      if (k === '%') { cur = String(parseFloat(cur) / 100); show(); return; }
+
+      if (['+', '−', '×', '÷'].includes(k)) {
+        if (op !== null && !fresh) {
+          cur = String(compute(prev, parseFloat(cur), op));
+          show();
+        }
+        prev = parseFloat(cur);
+        op = k;
+        fresh = true;
+        return;
+      }
+
+      if (k === '=') {
+        if (op !== null) {
+          cur = String(compute(prev, parseFloat(cur), op));
+          prev = null; op = null; fresh = true;
+          show();
+        }
+        return;
+      }
+
+      if (k === '.') {
+        if (fresh) { cur = '0.'; fresh = false; show(); return; }
+        if (!cur.includes('.')) { cur += '.'; show(); }
+        return;
+      }
+
+      if (fresh) { cur = k; fresh = false; }
+      else cur = cur === '0' ? k : cur + k;
+      show();
+    });
+  });
+
+  show();
+}
+
+/* ---- SETTINGS ---- */
+function initSettings(view) {
+  view.querySelectorAll('[data-toggle]').forEach(t => {
+    if (t.dataset.bound) return;
+    t.dataset.bound = '1';
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+
+  view.querySelectorAll('.wall-swatch').forEach(sw => {
+    if (sw.dataset.bound) return;
+    sw.dataset.bound = '1';
+    sw.addEventListener('click', () => {
+      view.querySelectorAll('.wall-swatch').forEach(s => s.classList.remove('sel'));
+      sw.classList.add('sel');
+      $('#wallpaper').style.background = WALLS[parseInt(sw.dataset.wall, 10)];
+    });
+  });
+}
+
+/* ---- MESSAGES ---- */
+function initMessages(view) {
+  const list = view.querySelector('#msgList');
+  const thread = view.querySelector('#msgThread');
+  const title = view.querySelector('#msgTitle');
+  const back = view.querySelector('#msgBack');
+  let open = false;
+
+  list.innerHTML = chats.map((c, i) => `
+    <div class="msg-item" data-i="${i}">
+      <div class="avatar" style="background:${c.color}">${c.letter}</div>
+      <div class="msg-meta"><div class="n">${c.name}</div><div class="p">${c.last}</div></div>
+      <div class="msg-time">${c.time}</div>
+    </div>`).join('');
+
+  list.querySelectorAll('.msg-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const c = chats[parseInt(el.dataset.i, 10)];
+      title.textContent = c.name;
+      thread.innerHTML = c.msgs.map(m => `<div class="bubble ${m.me ? 'me' : 'them'}">${m.t}</div>`).join('');
+      thread.scrollTop = thread.scrollHeight;
+      list.style.display = 'none';
+      thread.style.display = 'flex';
+      back.style.display = 'grid';
+      open = true;
+    });
+  });
+
+  back.addEventListener('click', () => {
+    list.style.display = 'block';
+    thread.style.display = 'none';
+    back.style.display = 'none';
+    title.textContent = 'Messages';
+    open = false;
+  });
+}
+
+/* ---- CAMERA ---- */
+function initCamera(view) {
+  const shutter = view.querySelector('#shutter');
+  const flash = view.querySelector('#camFlash');
+  if (shutter.dataset.bound) return;
+  shutter.dataset.bound = '1';
+
+  shutter.addEventListener('click', () => {
+    flash.classList.remove('go');
+    void flash.offsetWidth;
+    flash.classList.add('go');
+
+    const palettes = [
+      ['#ff9a9e', '#fad0c4'], ['#a1c4fd', '#c2e9fb'], ['#84fab0', '#8fd3f4'],
+      ['#fbc2eb', '#a6c1ee'], ['#ffecd2', '#fcb69f'], ['#d4fc79', '#96e6a1'],
+      ['#f093fb', '#f5576c'], ['#4facfe', '#00f2fe'], ['#43e97b', '#38f9d7'],
+      ['#fa709a', '#fee140'], ['#30cfd0', '#330867'], ['#5ee7df', '#b490ca']
+    ];
+    const p = palettes[Math.floor(Math.random() * palettes.length)];
+    photos.unshift(`linear-gradient(160deg,${p[0]},${p[1]})`);
+    if (photos.length > 30) photos.pop();
+  });
+}
+
+/* ---- MUSIC ---- */
+function initMusic(view) {
+  const play = view.querySelector('#mPlay');
+  const icon = view.querySelector('#mPlayIcon');
+  const bar = view.querySelector('#mProgress');
+  const cur = view.querySelector('#mCur');
+  if (play.dataset.bound) return;
+  play.dataset.bound = '1';
+
+  let playing = false;
+  let pos = 72;
+  const total = 224;
+  let timer = null;
+
+  function fmt(s) { return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
+
+  function update() {
+    bar.style.width = (pos / total * 100) + '%';
+    cur.textContent = fmt(pos);
+  }
+
+  play.addEventListener('click', () => {
+    playing = !playing;
+    icon.innerHTML = playing
+      ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+    if (playing) {
+      timer = setInterval(() => {
+        pos += 0.25;
+        if (pos >= total) { pos = 0; }
+        update();
+      }, 250);
+    } else {
+      clearInterval(timer);
+    }
+  });
+
+  update();
+}
+
+/* ==================================================================
+   LOCK SCREEN GESTURE
+   ================================================================== */
+(function lockGestures() {
+  let startY = 0, startX = 0, dragging = false, dy = 0, moved = false;
+
+  lockEl.addEventListener('pointerdown', e => {
+    if (!state.locked) return;
+    dragging = true; moved = false;
+    startY = e.clientY; startX = e.clientX; dy = 0;
+    lockEl.style.transition = 'none';
+  });
+
+  lockEl.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    dy = e.clientY - startY;
+    if (Math.abs(e.clientX - startX) > 8 || Math.abs(dy) > 8) moved = true;
+    if (dy < 0) {
+      lockEl.style.transform = `translateY(${dy * 0.7}px)`;
+      lockEl.style.opacity = String(Math.max(0, 1 + dy / 700));
+    }
+  });
+
+  function end() {
+    if (!dragging) return;
+    dragging = false;
+    lockEl.style.transition = '';
+    lockEl.style.transform = '';
+    lockEl.style.opacity = '';
+
+    if (dy < -70 || !moved) unlock();
+  }
+
+  lockEl.addEventListener('pointerup', end);
+  lockEl.addEventListener('pointercancel', end);
+})();
+
+function unlock() {
+  if (!state.locked) return;
+  state.locked = false;
+  lockEl.classList.add('unlocked');
+}
+
+function lock() {
+  if (state.locked) return;
+  closeApp();
+  closePanel();
+  state.locked = true;
+  lockEl.classList.remove('unlocked');
+  lockEl.style.transform = '';
+  lockEl.style.opacity = '';
+}
+
+/* ==================================================================
+   CONTROL CENTER / NOTIFICATIONS
+   ================================================================== */
+const ccEl = $('#controlCenter');
+const ncEl = $('#notifCenter');
+const scrim = $('#scrim');
+
+function openPanel(which) {
+  state.panel = which;
+  (which === 'cc' ? ccEl : ncEl).classList.add('open');
+  scrim.classList.add('show');
+}
+
+function closePanel() {
+  state.panel = null;
+  ccEl.classList.remove('open');
+  ncEl.classList.remove('open');
+  scrim.classList.remove('show');
+}
+
+scrim.addEventListener('click', closePanel);
+
+/* edge drag */
+(function edgeGestures() {
+  const edge = $('#edgeZone');
+  let startX = 0, dragging = false;
+
+  edge.addEventListener('pointerdown', e => {
+    dragging = true;
+    startX = e.clientX;
+  });
+
+  edge.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dy = e.clientY;
+    if (dy > 34) {
+      dragging = false;
+      const rect = screenEl.getBoundingClientRect();
+      openPanel(startX - rect.left > rect.width / 2 ? 'cc' : 'nc');
+    }
+  });
+
+  edge.addEventListener('pointerup', () => { dragging = false; });
+  edge.addEventListener('pointercancel', () => { dragging = false; });
+})();
+
+/* control center toggles */
+$$('#controlCenter [data-toggle]').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('on'));
+});
+
+$('#lockBtn').addEventListener('click', () => {
+  closePanel();
+  setTimeout(lock, 250);
+});
+
+$('#powerBtn').addEventListener('click', () => {
+  if (state.locked) unlock();
+  else lock();
+});
+
+/* sliders */
+$$('.slider').forEach(slider => {
+  const fill = slider.querySelector('.slider-fill');
+  let active = false;
+
+  function setFromX(clientX) {
+    const r = slider.getBoundingClientRect();
+    let pct = (clientX - r.left) / r.width;
+    pct = Math.max(0.05, Math.min(1, pct));
+    fill.style.width = (pct * 100) + '%';
+    if (slider.dataset.slider === 'brightness') {
+      $('#wallpaper').style.filter = `brightness(${0.5 + pct * 0.8})`;
+    }
+  }
+
+  slider.addEventListener('pointerdown', e => {
+    active = true;
+    slider.setPointerCapture(e.pointerId);
+    setFromX(e.clientX);
+  });
+  slider.addEventListener('pointermove', e => { if (active) setFromX(e.clientX); });
+  slider.addEventListener('pointerup', () => { active = false; });
+  slider.addEventListener('pointercancel', () => { active = false; });
+});
+
+/* ==================================================================
+   MISC
+   ================================================================== */
+/* Prevent double-tap zoom on iOS */
+document.addEventListener('gesturestart', e => e.preventDefault());
+
+/* Keep lock clock accurate */
+tick();
+</script>
+</body>
+</html>
