@@ -7,18 +7,29 @@
 <style>
 /* ============ 基础重置 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-body { background: #222; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Tahoma', 'Arial', sans-serif; overflow: hidden; }
-
-/* ============ N95 手机外壳 ============ */
-.n95-phone {
-  position: relative; width: 100vw; height: 100vh; 
-  max-width: 400px; max-height: 850px;
-  background: #111; overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 10px rgba(0,0,0,0.8);
+body { 
+  background: #1a1a1a; /* 外围环境变黑 */
+  height: 100vh; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; /* 居中显示 */
+  font-family: 'Tahoma', 'Arial', sans-serif; 
+  overflow: hidden; 
 }
-@media (min-width: 420px) {
-  /* 在电脑屏幕上模拟手机边框 */
-  .n95-phone { border-radius: 24px; border: 3px solid #444; height: 90vh; }
+
+/* ============ N95 手机外壳 (尺寸缩水版) ============ */
+.n95-phone {
+  position: relative; 
+  width: 100vw; 
+  height: 85vh; /* 不占满全屏了！ */
+  max-width: 380px; 
+  max-height: 700px; /* 强制限制最大高度，绝对拉不长 */
+  aspect-ratio: 9 / 18.5; /* 锁定真机比例 */
+  background: #111; 
+  overflow: hidden; 
+  border-radius: 24px; 
+  border: 4px solid #333;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
 }
 
 /* 滑动轨道 */
@@ -35,10 +46,7 @@ body { background: #222; height: 100vh; display: flex; justify-content: center; 
   display: flex; justify-content: center; align-items: center; gap: 15px;
   border-bottom: 1px solid #000;
 }
-.media-btn { 
-  width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #444, #111);
-  border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer;
-}
+.media-btn { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #444, #111); border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; }
 .media-btn:active { background: #000; transform: scale(0.95); }
 
 /* ============ 2. 屏幕区域 ============ */
@@ -71,18 +79,23 @@ body { background: #222; height: 100vh; display: flex; justify-content: center; 
 .sk-btn { cursor: pointer; padding: 5px; }
 .sk-btn:active { color: #0050ef; }
 
-/* ============ 待机桌面 (修复大空白) ============ */
-#home-view { background: radial-gradient(circle at top, #001a66 0%, #00081a 100%); color: #fff; }
+/* ============ 待机桌面 (纯净版) ============ */
+#home-view { 
+  background: radial-gradient(circle at top, #001a66 0%, #00081a 100%); 
+  color: #fff; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; /* 时钟和底部自动分开 */
+}
 .home-top { padding: 10px 15px; display: flex; justify-content: space-between; font-size: 12px; text-shadow: 1px 1px 1px #000; }
-.home-clock { text-align: center; margin-top: 50px; text-shadow: 1px 1px 3px #000; }
-.home-clock .time { font-size: 56px; font-weight: bold; letter-spacing: 2px; }
+.home-clock { text-align: center; text-shadow: 1px 1px 3px #000; margin-top: 40px; }
+.home-clock .time { font-size: 58px; font-weight: bold; letter-spacing: 2px; }
 .home-clock .date { font-size: 14px; margin-top: 5px; color: #ddd; }
 
-/* 中间快捷图标区，填满空白 */
-.home-apps { margin-top: 60px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 20px; }
-.home-app { display: flex; flex-direction: column; align-items: center; font-size: 12px; text-shadow: 1px 1px 1px #000; cursor: pointer; }
-.home-app:active { transform: scale(0.9); }
-.home-app .icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; font-size: 20px; margin-bottom: 5px; }
+/* 底部快捷方式 */
+.home-shortcuts { display: flex; gap: 4px; padding: 10px 15px 5px 15px; }
+.home-shortcut { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 8px 0; flex: 1; text-align: center; font-size: 12px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;}
+.home-shortcut:active { background: rgba(255,255,255,0.4); }
 
 /* ============ 功能表 ============ */
 #menu-view { background: #0050ef; }
@@ -112,7 +125,7 @@ body { background: #222; height: 100vh; display: flex; justify-content: center; 
 
 /* ============ 3. 底部数字键盘 ============ */
 .num-pad {
-  position: absolute; top: 100%; left: 0; width: 100%; height: 280px;
+  position: absolute; top: 100%; left: 0; width: 100%; height: 270px;
   background: #1a1a1a; display: flex; flex-direction: column; padding: 10px 8px;
 }
 .nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px;}
@@ -160,23 +173,23 @@ body { background: #222; height: 100vh; display: flex; justify-content: center; 
         <div class="sb-left" style="gap: 8px;"><span>3G</span><div class="sb-bat"><div></div></div></div>
       </div>
 
-      <!-- 1. 待机桌面 (重新排版) -->
+      <!-- 1. 待机桌面 -->
       <div class="view active" id="home-view">
         <div class="home-top"><span>中国移动</span><span>标准</span></div>
+        
         <div class="home-clock">
           <div class="time" id="home-time">10:00</div>
           <div class="date" id="home-date">11月15日 星期日</div>
         </div>
-        
-        <!-- 中间快捷应用，填补空白 -->
-        <div class="home-apps">
-          <div class="home-app" onclick="openApp('messages')"><div class="icon">✉️</div>信息</div>
-          <div class="home-app" onclick="openApp('contacts')"><div class="icon">👤</div>通讯录</div>
-          <div class="home-app" onclick="openApp('calendar')"><div class="icon">📅</div>日历</div>
-          <div class="home-app" onclick="switchView('menu')"><div class="icon">≡</div>功能表</div>
+
+        <!-- 只有底部的快捷方式，中间留空，因为手机尺寸变小了，留白是正常的 -->
+        <div class="home-shortcuts">
+          <div class="home-shortcut" onclick="openApp('messages')">✉️ 信息</div>
+          <div class="home-shortcut" onclick="openApp('contacts')">👤 通讯录</div>
+          <div class="home-shortcut" onclick="switchView('menu')">≡ 功能表</div>
         </div>
         
-        <div class="softkey-bar" style="margin-top: auto;"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
+        <div class="softkey-bar"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
       </div>
 
       <!-- 2. 功能表 -->
@@ -192,7 +205,7 @@ body { background: #222; height: 100vh; display: flex; justify-content: center; 
           <div class="menu-item" onclick="openApp('web')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#00f)">🌐</div><div class="menu-text">网络</div></div>
           <div class="menu-item" onclick="openApp('ovi')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#08f)">🛍️</div><div class="menu-text">Ovi</div></div>
         </div>
-        <div class="softkey-bar" style="margin-top: auto;"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
+        <div class="softkey-bar"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
       </div>
 
       <!-- 3. App 容器 -->
@@ -298,11 +311,11 @@ function calc(val) {
 
 /* 推拉滑盖逻辑 */
 const track = document.getElementById('slidingTrack');
-let currentSlide = 0; // 0: 合上, -280: 数字键盘, 100: 媒体键
+let currentSlide = 0; 
 
 function slideTo(mode) {
   vibrate();
-  if (mode === 'num') currentSlide = -280;
+  if (mode === 'num') currentSlide = -270;
   else if (mode === 'media') currentSlide = 100;
   else currentSlide = 0;
   track.style.transform = `translateY(${currentSlide}px)`;
@@ -312,9 +325,7 @@ let startY = 0, isDragging = false, startTransform = 0;
 const phone = document.getElementById('n95Phone');
 
 phone.addEventListener('touchstart', e => {
-  // 排除在可滚动区域内滑动
-  if (e.target.closest('.app-content') || e.target.closest('.home-apps') || e.target.closest('.menu-grid')) return;
-  
+  if (e.target.closest('.app-content') || e.target.closest('.menu-grid')) return;
   startY = e.touches[0].clientY;
   isDragging = true;
   startTransform = currentSlide;
@@ -327,7 +338,7 @@ phone.addEventListener('touchmove', e => {
   let newTransform = startTransform + dy;
   
   if (newTransform > 120) newTransform = 120;
-  if (newTransform < -300) newTransform = -300;
+  if (newTransform < -290) newTransform = -290;
   
   track.style.transform = `translateY(${newTransform}px)`;
   if (e.cancelable) e.preventDefault();
@@ -344,7 +355,7 @@ phone.addEventListener('touchend', e => {
     if (dy < -60) slideTo('num');
     else if (dy > 60) slideTo('media');
     else slideTo('close');
-  } else if (currentSlide === -280) {
+  } else if (currentSlide === -270) {
     if (dy > 60) slideTo('close');
     else slideTo('num');
   } else if (currentSlide === 100) {
