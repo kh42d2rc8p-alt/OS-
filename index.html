@@ -3,57 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Nokia N95</title>
+<title>Nokia S60 Classic</title>
 <style>
 /* ============ 基础重置 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 body { 
-  background: #1a1a1a; /* 外围环境变黑 */
+  background: #222; 
   height: 100vh; 
   display: flex; 
   justify-content: center; 
-  align-items: center; /* 居中显示 */
+  align-items: center; 
   font-family: 'Tahoma', 'Arial', sans-serif; 
   overflow: hidden; 
 }
 
-/* ============ N95 手机外壳 (尺寸缩水版) ============ */
-.n95-phone {
+/* ============ 手机外壳 (直板机) ============ */
+.nokia-phone {
   position: relative; 
   width: 100vw; 
-  height: 85vh; /* 不占满全屏了！ */
+  height: 95vh; 
   max-width: 380px; 
-  max-height: 700px; /* 强制限制最大高度，绝对拉不长 */
-  aspect-ratio: 9 / 18.5; /* 锁定真机比例 */
+  max-height: 800px;
   background: #111; 
+  display: flex;
+  flex-direction: column;
   overflow: hidden; 
-  border-radius: 24px; 
+  border-radius: 20px; 
   border: 4px solid #333;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9);
 }
 
-/* 滑动轨道 */
-.sliding-track {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-  will-change: transform; z-index: 10;
-}
-
-/* ============ 1. 顶部多媒体键盘 ============ */
-.media-pad {
-  position: absolute; top: -100px; left: 0; width: 100%; height: 100px;
-  background: linear-gradient(180deg, #222 0%, #111 100%);
-  display: flex; justify-content: center; align-items: center; gap: 15px;
-  border-bottom: 1px solid #000;
-}
-.media-btn { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #444, #111); border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; }
-.media-btn:active { background: #000; transform: scale(0.95); }
-
-/* ============ 2. 屏幕区域 ============ */
+/* ============ 1. 屏幕区域 ============ */
 .screen-container {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: #000; display: flex; flex-direction: column; z-index: 20;
-  border-bottom: 2px solid #333;
+  flex: 1; /* 占据上方剩余空间 */
+  background: #000; 
+  display: flex; 
+  flex-direction: column; 
+  border-bottom: 2px solid #000;
 }
 
 /* 状态栏 */
@@ -72,34 +58,41 @@ body {
 .view { display: none; flex: 1; flex-direction: column; background: #fff; position: relative; overflow: hidden; }
 .view.active { display: flex; }
 
-/* 软键底栏 */
+/* 软键底栏 (屏幕内) */
 .softkey-bar {
   height: 34px; background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%); border-top: 1px solid #999; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0;
 }
 .sk-btn { cursor: pointer; padding: 5px; }
 .sk-btn:active { color: #0050ef; }
 
-/* ============ 待机桌面 (纯净版) ============ */
+/* ============ 待机桌面 ============ */
 #home-view { 
   background: radial-gradient(circle at top, #001a66 0%, #00081a 100%); 
   color: #fff; 
   display: flex; 
   flex-direction: column; 
-  justify-content: space-between; /* 时钟和底部自动分开 */
+  justify-content: space-between; /* 时钟在上，快捷键在下 */
 }
 .home-top { padding: 10px 15px; display: flex; justify-content: space-between; font-size: 12px; text-shadow: 1px 1px 1px #000; }
-.home-clock { text-align: center; text-shadow: 1px 1px 3px #000; margin-top: 40px; }
-.home-clock .time { font-size: 58px; font-weight: bold; letter-spacing: 2px; }
+.home-clock { text-align: center; text-shadow: 1px 1px 3px #000; margin-top: 20px; }
+.home-clock .time { font-size: 52px; font-weight: bold; letter-spacing: 2px; }
 .home-clock .date { font-size: 14px; margin-top: 5px; color: #ddd; }
 
-/* 底部快捷方式 */
-.home-shortcuts { display: flex; gap: 4px; padding: 10px 15px 5px 15px; }
-.home-shortcut { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 8px 0; flex: 1; text-align: center; font-size: 12px; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;}
-.home-shortcut:active { background: rgba(255,255,255,0.4); }
+/* 桌面快捷方式居中 */
+.home-apps { 
+  display: grid; 
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 10px; 
+  padding: 0 20px; 
+  margin-bottom: 10px;
+}
+.home-app { display: flex; flex-direction: column; align-items: center; font-size: 12px; text-shadow: 1px 1px 1px #000; cursor: pointer; }
+.home-app:active { transform: scale(0.9); }
+.home-app .icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; font-size: 20px; margin-bottom: 5px; }
 
 /* ============ 功能表 ============ */
 #menu-view { background: #0050ef; }
-.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px 10px; align-content: start; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px 10px; align-content: start; overflow-y: auto; }
 .menu-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .menu-item:active .menu-icon { transform: scale(0.9); }
 .menu-icon {
@@ -123,120 +116,124 @@ body {
 .calc-btn { background: linear-gradient(180deg, #fff 0%, #ccc 100%); border: 1px solid #999; border-radius: 4px; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 0 #999; }
 .calc-btn:active { box-shadow: none; transform: translateY(2px); }
 
-/* ============ 3. 底部数字键盘 ============ */
+/* ============ 2. 底部实体键盘区 (固定显示) ============ */
 .num-pad {
-  position: absolute; top: 100%; left: 0; width: 100%; height: 270px;
-  background: #1a1a1a; display: flex; flex-direction: column; padding: 10px 8px;
+  height: 260px; /* 固定高度 */
+  background: #1a1a1a; 
+  display: flex; 
+  flex-direction: column; 
+  padding: 10px 8px;
+  flex-shrink: 0;
 }
 .nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px;}
-.nav-ring { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(180deg, #333 0%, #111 100%); position: relative; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
-.nav-center { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(180deg, #555 0%, #222 100%); border: 1px solid #000; }
-.nav-up, .nav-down, .nav-left, .nav-right { position: absolute; color: #aaa; font-size: 12px; }
-.nav-up { top: 2px; } .nav-down { bottom: 2px; } .nav-left { left: 5px; } .nav-right { right: 5px; }
-.softkey { width: 70px; height: 28px; background: linear-gradient(180deg, #333 0%, #111 100%); border-radius: 14px 14px 4px 4px; color: #fff; font-size: 12px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); border: 1px solid #000; }
-.softkey:active { background: #000; }
-.key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; flex: 1; }
-.key { background: linear-gradient(180deg, #3a3a3a 0%, #151515 100%); border-radius: 5px; border: 1px solid #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.5); }
-.key:active { background: #000; }
-.key span { font-size: 8px; color: #888; margin-top: 2px; font-weight: normal; text-transform: uppercase; }
-
-/* ============ 滑盖提示 ============ */
-.slide-hint {
-  position: absolute; left: 0; width: 100%; height: 25px; z-index: 100;
+.nav-ring { 
+  width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(180deg, #333 0%, #111 100%); 
+  position: relative; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5); 
   display: flex; justify-content: center; align-items: center; cursor: pointer;
 }
-.slide-hint.top { top: 0; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
-.slide-hint.bottom { bottom: 0; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
-.hint-text { font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+.nav-ring:active { background: #000; }
+.nav-center { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(180deg, #555 0%, #222 100%); border: 1px solid #000; }
+.nav-up, .nav-down, .nav-left, .nav-right { position: absolute; color: #aaa; font-size: 10px; pointer-events: none;}
+.nav-up { top: 3px; } .nav-down { bottom: 3px; } .nav-left { left: 6px; } .nav-right { right: 6px; }
+
+.softkey { 
+  width: 75px; height: 30px; background: linear-gradient(180deg, #333 0%, #111 100%); 
+  border-radius: 15px 15px 5px 5px; color: #fff; font-size: 12px; 
+  display: flex; justify-content: center; align-items: center; 
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); border: 1px solid #000; cursor: pointer;
+}
+.softkey:active { background: #000; color: #0050ef; }
+
+.key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; flex: 1; }
+.key { 
+  background: linear-gradient(180deg, #3a3a3a 0%, #151515 100%); 
+  border-radius: 5px; border: 1px solid #000; color: #fff; 
+  display: flex; flex-direction: column; justify-content: center; align-items: center; 
+  font-size: 16px; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.5); cursor: pointer;
+}
+.key:active { background: #000; }
+.key span { font-size: 8px; color: #888; margin-top: 2px; font-weight: normal; text-transform: uppercase; }
+.key.red { background: linear-gradient(180deg, #5a1a1a 0%, #200); }
+.key.green { background: linear-gradient(180deg, #1a5a1a 0%, #020); }
+
 ::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
 
-<div class="n95-phone" id="n95Phone">
+<div class="nokia-phone">
   
-  <div class="slide-hint top" onclick="slideTo('media')"><span class="hint-text">▼ 推下露出数字键盘</span></div>
-  <div class="slide-hint bottom" onclick="slideTo('num')"><span class="hint-text">▲ 推上露出媒体键</span></div>
-
-  <div class="sliding-track" id="slidingTrack">
-    
-    <div class="media-pad">
-      <div class="media-btn">⏮</div>
-      <div class="media-btn">▶️</div>
-      <div class="media-btn">⏭</div>
-      <div class="media-btn">⏹</div>
+  <!-- 1. 屏幕区域 -->
+  <div class="screen-container">
+    <div class="status-bar">
+      <div class="sb-left"><div class="sb-signal"><div></div><div></div><div></div><div></div></div><span>中国移动</span></div>
+      <div class="sb-left" style="gap: 8px;"><span>3G</span><div class="sb-bat"><div></div></div></div>
     </div>
 
-    <div class="screen-container">
-      <div class="status-bar">
-        <div class="sb-left"><div class="sb-signal"><div></div><div></div><div></div><div></div></div><span>中国移动</span></div>
-        <div class="sb-left" style="gap: 8px;"><span>3G</span><div class="sb-bat"><div></div></div></div>
+    <!-- 待机桌面 -->
+    <div class="view active" id="home-view">
+      <div class="home-top"><span>中国移动</span><span>标准</span></div>
+      
+      <div class="home-clock">
+        <div class="time" id="home-time">10:00</div>
+        <div class="date" id="home-date">11月15日 星期日</div>
       </div>
 
-      <!-- 1. 待机桌面 -->
-      <div class="view active" id="home-view">
-        <div class="home-top"><span>中国移动</span><span>标准</span></div>
-        
-        <div class="home-clock">
-          <div class="time" id="home-time">10:00</div>
-          <div class="date" id="home-date">11月15日 星期日</div>
-        </div>
-
-        <!-- 只有底部的快捷方式，中间留空，因为手机尺寸变小了，留白是正常的 -->
-        <div class="home-shortcuts">
-          <div class="home-shortcut" onclick="openApp('messages')">✉️ 信息</div>
-          <div class="home-shortcut" onclick="openApp('contacts')">👤 通讯录</div>
-          <div class="home-shortcut" onclick="switchView('menu')">≡ 功能表</div>
-        </div>
-        
-        <div class="softkey-bar"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
+      <!-- 快捷图标直接放中间 -->
+      <div class="home-apps">
+        <div class="home-app" onclick="openApp('messages')"><div class="icon">✉️</div>信息</div>
+        <div class="home-app" onclick="openApp('contacts')"><div class="icon">👤</div>通讯录</div>
+        <div class="home-app" onclick="openApp('calendar')"><div class="icon">📅</div>日历</div>
+        <div class="home-app" onclick="switchView('menu')"><div class="icon">≡</div>功能表</div>
       </div>
-
-      <!-- 2. 功能表 -->
-      <div class="view" id="menu-view">
-        <div class="menu-grid">
-          <div class="menu-item" onclick="openApp('messages')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#0f0)">✉️</div><div class="menu-text">信息</div></div>
-          <div class="menu-item" onclick="openApp('contacts')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#ff0)">👤</div><div class="menu-text">通讯录</div></div>
-          <div class="menu-item" onclick="openApp('calendar')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#f00)">📅</div><div class="menu-text">日历</div></div>
-          <div class="menu-item" onclick="openApp('music')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#0ff)">🎵</div><div class="menu-text">音乐</div></div>
-          <div class="menu-item" onclick="openApp('calc')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#aaa)">🔢</div><div class="menu-text">计算器</div></div>
-          <div class="menu-item" onclick="openApp('settings')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#999)">⚙️</div><div class="menu-text">设置</div></div>
-          <div class="menu-item" onclick="openApp('gallery')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#f0f)">🖼️</div><div class="menu-text">图库</div></div>
-          <div class="menu-item" onclick="openApp('web')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#00f)">🌐</div><div class="menu-text">网络</div></div>
-          <div class="menu-item" onclick="openApp('ovi')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#08f)">🛍️</div><div class="menu-text">Ovi</div></div>
-        </div>
-        <div class="softkey-bar"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
-      </div>
-
-      <!-- 3. App 容器 -->
-      <div class="view" id="app-view">
-        <div class="app-title" id="app-title">应用</div>
-        <div class="app-content" id="app-content"></div>
-        <div class="softkey-bar"><span class="sk-btn">选项</span><span class="sk-btn" onclick="closeApp()">返回</span></div>
-      </div>
+      
+      <div class="softkey-bar"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
     </div>
 
-    <!-- 底部：数字键盘区 -->
-    <div class="num-pad">
-      <div class="nav-area">
-        <div class="softkey" onclick="vibrate()">选项</div>
-        <div class="nav-ring" onclick="vibrate()">
-          <div class="nav-center"></div><div class="nav-up">▲</div><div class="nav-down">▼</div><div class="nav-left">◀</div><div class="nav-right">▶</div>
-        </div>
-        <div class="softkey" onclick="closeApp()">返回</div>
+    <!-- 功能表 -->
+    <div class="view" id="menu-view">
+      <div class="menu-grid">
+        <div class="menu-item" onclick="openApp('messages')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#0f0)">✉️</div><div class="menu-text">信息</div></div>
+        <div class="menu-item" onclick="openApp('contacts')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#ff0)">👤</div><div class="menu-text">通讯录</div></div>
+        <div class="menu-item" onclick="openApp('calendar')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#f00)">📅</div><div class="menu-text">日历</div></div>
+        <div class="menu-item" onclick="openApp('music')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#0ff)">🎵</div><div class="menu-text">音乐</div></div>
+        <div class="menu-item" onclick="openApp('calc')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#aaa)">🔢</div><div class="menu-text">计算器</div></div>
+        <div class="menu-item" onclick="openApp('settings')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#999)">⚙️</div><div class="menu-text">设置</div></div>
+        <div class="menu-item" onclick="openApp('gallery')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#f0f)">🖼️</div><div class="menu-text">图库</div></div>
+        <div class="menu-item" onclick="openApp('web')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#00f)">🌐</div><div class="menu-text">网络</div></div>
+        <div class="menu-item" onclick="openApp('ovi')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#08f)">🛍️</div><div class="menu-text">Ovi</div></div>
       </div>
-      <div class="key-grid">
-        <div class="key" onclick="vibrate()">1<span>.,?!</span></div><div class="key" onclick="vibrate()">2<span>abc</span></div><div class="key" onclick="vibrate()">3<span>def</span></div><div class="key" style="background: #4a1a1a;" onclick="vibrate()">C</div>
-        <div class="key" onclick="vibrate()">4<span>ghi</span></div><div class="key" onclick="vibrate()">5<span>jkl</span></div><div class="key" onclick="vibrate()">6<span>mno</span></div><div class="key" style="background: #1a4a1a;" onclick="vibrate()">📞</div>
-        <div class="key" onclick="vibrate()">7<span>pqrs</span></div><div class="key" onclick="vibrate()">8<span>tuv</span></div><div class="key" onclick="vibrate()">9<span>wxyz</span></div><div class="key" style="background: #4a1a1a;" onclick="vibrate()">🔴</div>
-        <div class="key" style="background: none; border: none; box-shadow: none;"></div>
-        <div class="key" onclick="vibrate()">0<span>space</span></div>
-        <div class="key" onclick="vibrate()">#<span>⇧</span></div>
-        <div class="key" style="background: none; border: none; box-shadow: none;"></div>
-      </div>
+      <div class="softkey-bar"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
     </div>
 
+    <!-- App 容器 -->
+    <div class="view" id="app-view">
+      <div class="app-title" id="app-title">应用</div>
+      <div class="app-content" id="app-content"></div>
+      <div class="softkey-bar"><span class="sk-btn">选项</span><span class="sk-btn" onclick="closeApp()">返回</span></div>
+    </div>
   </div>
+
+  <!-- 2. 物理键盘区域 (固定在下半部分) -->
+  <div class="num-pad">
+    <div class="nav-area">
+      <div class="softkey" onclick="handleSoftkey('left')">选项</div>
+      <div class="nav-ring" onclick="handleSoftkey('center')">
+        <div class="nav-center"></div><div class="nav-up">▲</div><div class="nav-down">▼</div><div class="nav-left">◀</div><div class="nav-right">▶</div>
+      </div>
+      <div class="softkey" onclick="handleSoftkey('right')">返回</div>
+    </div>
+    <div class="key-grid">
+      <div class="key" onclick="vibrate()">1<span>.,?!</span></div><div class="key" onclick="vibrate()">2<span>abc</span></div><div class="key" onclick="vibrate()">3<span>def</span></div><div class="key red" onclick="vibrate()">C</div>
+      <div class="key" onclick="vibrate()">4<span>ghi</span></div><div class="key" onclick="vibrate()">5<span>jkl</span></div><div class="key" onclick="vibrate()">6<span>mno</span></div><div class="key green" onclick="vibrate()">📞</div>
+      <div class="key" onclick="vibrate()">7<span>pqrs</span></div><div class="key" onclick="vibrate()">8<span>tuv</span></div><div class="key" onclick="vibrate()">9<span>wxyz</span></div><div class="key red" onclick="vibrate()">🔴</div>
+      <div class="key" style="background: none; border: none; box-shadow: none;"></div>
+      <div class="key" onclick="vibrate()">0<span>space</span></div>
+      <div class="key" onclick="vibrate()">#<span>⇧</span></div>
+      <div class="key" style="background: none; border: none; box-shadow: none;"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -299,6 +296,18 @@ function closeApp() {
   else if (currentView === 'menu') switchView('home');
 }
 
+function handleSoftkey(side) {
+  vibrate();
+  if (side === 'left') {
+    if (currentView === 'home') switchView('menu');
+    else if (currentView === 'menu') openApp('calc');
+  } else if (side === 'right') {
+    closeApp();
+  } else if (side === 'center') {
+    if (currentView === 'home') switchView('menu');
+  }
+}
+
 function calc(val) {
   vibrate();
   const disp = document.getElementById('calc-disp');
@@ -308,61 +317,6 @@ function calc(val) {
   window.calcStr += val;
   disp.innerText = window.calcStr;
 }
-
-/* 推拉滑盖逻辑 */
-const track = document.getElementById('slidingTrack');
-let currentSlide = 0; 
-
-function slideTo(mode) {
-  vibrate();
-  if (mode === 'num') currentSlide = -270;
-  else if (mode === 'media') currentSlide = 100;
-  else currentSlide = 0;
-  track.style.transform = `translateY(${currentSlide}px)`;
-}
-
-let startY = 0, isDragging = false, startTransform = 0;
-const phone = document.getElementById('n95Phone');
-
-phone.addEventListener('touchstart', e => {
-  if (e.target.closest('.app-content') || e.target.closest('.menu-grid')) return;
-  startY = e.touches[0].clientY;
-  isDragging = true;
-  startTransform = currentSlide;
-  track.style.transition = 'none';
-}, {passive: true});
-
-phone.addEventListener('touchmove', e => {
-  if (!isDragging) return;
-  const dy = e.touches[0].clientY - startY;
-  let newTransform = startTransform + dy;
-  
-  if (newTransform > 120) newTransform = 120;
-  if (newTransform < -290) newTransform = -290;
-  
-  track.style.transform = `translateY(${newTransform}px)`;
-  if (e.cancelable) e.preventDefault();
-}, {passive: false});
-
-phone.addEventListener('touchend', e => {
-  if (!isDragging) return;
-  isDragging = false;
-  track.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1)';
-  
-  const dy = e.changedTouches[0].clientY - startY;
-  
-  if (currentSlide === 0) {
-    if (dy < -60) slideTo('num');
-    else if (dy > 60) slideTo('media');
-    else slideTo('close');
-  } else if (currentSlide === -270) {
-    if (dy > 60) slideTo('close');
-    else slideTo('num');
-  } else if (currentSlide === 100) {
-    if (dy < -60) slideTo('close');
-    else slideTo('media');
-  }
-});
 
 document.addEventListener('gesturestart', e => e.preventDefault());
 </script>
