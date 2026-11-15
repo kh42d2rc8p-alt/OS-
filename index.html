@@ -7,15 +7,18 @@
 <style>
 /* ============ 基础重置 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-body { background: #121212; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Tahoma', 'Arial', sans-serif; overflow: hidden; }
+body { background: #222; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Tahoma', 'Arial', sans-serif; overflow: hidden; }
 
-/* ============ N95 手机外壳 (精准比例) ============ */
+/* ============ N95 手机外壳 ============ */
 .n95-phone {
-  position: relative; width: 100vw; max-width: 390px; 
-  height: 90vh; max-height: 760px; /* 限制最大高度，不再无限拉长 */
-  aspect-ratio: 9 / 18.5; /* 强制真机比例 */
-  background: #111; overflow: hidden; border-radius: 24px; border: 3px solid #444;
+  position: relative; width: 100vw; height: 100vh; 
+  max-width: 400px; max-height: 850px;
+  background: #111; overflow: hidden;
   box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 10px rgba(0,0,0,0.8);
+}
+@media (min-width: 420px) {
+  /* 在电脑屏幕上模拟手机边框 */
+  .n95-phone { border-radius: 24px; border: 3px solid #444; height: 90vh; }
 }
 
 /* 滑动轨道 */
@@ -30,12 +33,11 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
   position: absolute; top: -100px; left: 0; width: 100%; height: 100px;
   background: linear-gradient(180deg, #222 0%, #111 100%);
   display: flex; justify-content: center; align-items: center; gap: 15px;
-  border-bottom: 1px solid #000; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5);
+  border-bottom: 1px solid #000;
 }
 .media-btn { 
   width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #444, #111);
-  border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center;
-  font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer;
+  border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer;
 }
 .media-btn:active { background: #000; transform: scale(0.95); }
 
@@ -48,15 +50,12 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
 
 /* 状态栏 */
 .status-bar {
-  height: 24px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 11px; color: #333; font-weight: bold; flex-shrink: 0;
+  height: 26px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 11px; color: #333; font-weight: bold; flex-shrink: 0;
 }
 .sb-left { display: flex; align-items: center; gap: 5px; }
 .sb-signal { display: flex; align-items: flex-end; gap: 1px; height: 10px; }
 .sb-signal div { width: 3px; background: #333; }
-.sb-signal div:nth-child(1) { height: 3px; }
-.sb-signal div:nth-child(2) { height: 5px; }
-.sb-signal div:nth-child(3) { height: 7px; }
-.sb-signal div:nth-child(4) { height: 9px; }
+.sb-signal div:nth-child(1) { height: 3px; } .sb-signal div:nth-child(2) { height: 5px; } .sb-signal div:nth-child(3) { height: 7px; } .sb-signal div:nth-child(4) { height: 9px; }
 .sb-bat { width: 16px; height: 9px; border: 1px solid #333; padding: 1px; position: relative; }
 .sb-bat::after { content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 3px; background: #333; }
 .sb-bat div { height: 100%; width: 80%; background: #333; }
@@ -67,36 +66,39 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
 
 /* 软键底栏 */
 .softkey-bar {
-  height: 32px; background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%); border-top: 1px solid #999; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0;
+  height: 34px; background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%); border-top: 1px solid #999; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0;
 }
 .sk-btn { cursor: pointer; padding: 5px; }
 .sk-btn:active { color: #0050ef; }
 
-/* ============ 待机桌面 ============ */
-#home-view { background: radial-gradient(circle at center, #002288 0%, #001144 100%); color: #fff; }
-.home-header { padding: 10px; display: flex; justify-content: space-between; font-size: 12px; text-shadow: 1px 1px 1px #000; }
-.home-clock { text-align: center; margin-top: 30px; text-shadow: 1px 1px 2px #000; }
-.home-clock .time { font-size: 52px; font-weight: bold; letter-spacing: 2px; }
-.home-clock .date { font-size: 14px; margin-top: 5px; }
-.home-shortcuts { margin-top: auto; padding: 10px; display: flex; gap: 5px; margin-bottom: 5px; }
-.home-shortcut { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 8px; flex: 1; text-align: center; font-size: 12px; color: #fff; cursor: pointer; }
-.home-shortcut:active { background: rgba(255,255,255,0.4); }
+/* ============ 待机桌面 (修复大空白) ============ */
+#home-view { background: radial-gradient(circle at top, #001a66 0%, #00081a 100%); color: #fff; }
+.home-top { padding: 10px 15px; display: flex; justify-content: space-between; font-size: 12px; text-shadow: 1px 1px 1px #000; }
+.home-clock { text-align: center; margin-top: 50px; text-shadow: 1px 1px 3px #000; }
+.home-clock .time { font-size: 56px; font-weight: bold; letter-spacing: 2px; }
+.home-clock .date { font-size: 14px; margin-top: 5px; color: #ddd; }
+
+/* 中间快捷图标区，填满空白 */
+.home-apps { margin-top: 60px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 20px; }
+.home-app { display: flex; flex-direction: column; align-items: center; font-size: 12px; text-shadow: 1px 1px 1px #000; cursor: pointer; }
+.home-app:active { transform: scale(0.9); }
+.home-app .icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; font-size: 20px; margin-bottom: 5px; }
 
 /* ============ 功能表 ============ */
 #menu-view { background: #0050ef; }
-.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; align-content: start; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 15px 10px; align-content: start; }
 .menu-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .menu-item:active .menu-icon { transform: scale(0.9); }
 .menu-icon {
-  width: 50px; height: 50px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.5);
-  display: flex; justify-content: center; align-items: center; font-size: 22px;
+  width: 54px; height: 54px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center; font-size: 24px;
   box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 3px 5px rgba(0,0,0,0.4);
   background: linear-gradient(180deg, #fff 0%, #ccc 100%); margin-bottom: 5px; transition: transform 0.1s;
 }
 .menu-text { color: #fff; font-size: 12px; text-shadow: 1px 1px 1px #000; font-weight: bold; }
 
 /* ============ App 视图 ============ */
-.app-title { background: linear-gradient(180deg, #4a4a4a 0%, #222 100%); color: #fff; text-align: center; padding: 6px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #000; flex-shrink: 0;}
+.app-title { background: linear-gradient(180deg, #4a4a4a 0%, #222 100%); color: #fff; text-align: center; padding: 8px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #000; flex-shrink: 0;}
 .app-content { flex: 1; overflow-y: auto; background: #fff; color: #000; padding: 10px; font-size: 14px; }
 .list-item { padding: 12px 5px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .list-item:active { background: #e0e0e0; }
@@ -110,19 +112,16 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
 
 /* ============ 3. 底部数字键盘 ============ */
 .num-pad {
-  position: absolute; top: 100%; left: 0; width: 100%; height: 260px;
-  background: #1a1a1a; display: flex; flex-direction: column; padding: 8px;
+  position: absolute; top: 100%; left: 0; width: 100%; height: 280px;
+  background: #1a1a1a; display: flex; flex-direction: column; padding: 10px 8px;
 }
-/* 导航键区域 */
 .nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px;}
 .nav-ring { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(180deg, #333 0%, #111 100%); position: relative; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
 .nav-center { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(180deg, #555 0%, #222 100%); border: 1px solid #000; }
 .nav-up, .nav-down, .nav-left, .nav-right { position: absolute; color: #aaa; font-size: 12px; }
 .nav-up { top: 2px; } .nav-down { bottom: 2px; } .nav-left { left: 5px; } .nav-right { right: 5px; }
-/* 软键 */
 .softkey { width: 70px; height: 28px; background: linear-gradient(180deg, #333 0%, #111 100%); border-radius: 14px 14px 4px 4px; color: #fff; font-size: 12px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); border: 1px solid #000; }
 .softkey:active { background: #000; }
-/* 数字键 */
 .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; flex: 1; }
 .key { background: linear-gradient(180deg, #3a3a3a 0%, #151515 100%); border-radius: 5px; border: 1px solid #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.5); }
 .key:active { background: #000; }
@@ -133,11 +132,9 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
   position: absolute; left: 0; width: 100%; height: 25px; z-index: 100;
   display: flex; justify-content: center; align-items: center; cursor: pointer;
 }
-.slide-hint.top { top: 0; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); }
-.slide-hint.bottom { bottom: 0; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); }
+.slide-hint.top { top: 0; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
+.slide-hint.bottom { bottom: 0; background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
 .hint-text { font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
-
-/* 隐藏滚动条 */
 ::-webkit-scrollbar { display: none; }
 </style>
 </head>
@@ -145,14 +142,11 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
 
 <div class="n95-phone" id="n95Phone">
   
-  <!-- 控制区域，用于手势识别 -->
   <div class="slide-hint top" onclick="slideTo('media')"><span class="hint-text">▼ 推下露出数字键盘</span></div>
   <div class="slide-hint bottom" onclick="slideTo('num')"><span class="hint-text">▲ 推上露出媒体键</span></div>
 
-  <!-- 滑动轨道 -->
   <div class="sliding-track" id="slidingTrack">
     
-    <!-- 顶部：隐藏的多媒体键盘 -->
     <div class="media-pad">
       <div class="media-btn">⏮</div>
       <div class="media-btn">▶️</div>
@@ -160,27 +154,29 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
       <div class="media-btn">⏹</div>
     </div>
 
-    <!-- 中间：全屏屏幕区 -->
     <div class="screen-container">
-      <!-- 状态栏 -->
       <div class="status-bar">
         <div class="sb-left"><div class="sb-signal"><div></div><div></div><div></div><div></div></div><span>中国移动</span></div>
         <div class="sb-left" style="gap: 8px;"><span>3G</span><div class="sb-bat"><div></div></div></div>
       </div>
 
-      <!-- 1. 桌面 -->
+      <!-- 1. 待机桌面 (重新排版) -->
       <div class="view active" id="home-view">
-        <div class="home-header"><span>中国移动</span><span>标准</span></div>
+        <div class="home-top"><span>中国移动</span><span>标准</span></div>
         <div class="home-clock">
           <div class="time" id="home-time">10:00</div>
-          <div class="date" id="home-date">11月15日 星期六</div>
+          <div class="date" id="home-date">11月15日 星期日</div>
         </div>
-        <div class="home-shortcuts">
-          <div class="home-shortcut" onclick="openApp('messages')">💬 信息</div>
-          <div class="home-shortcut" onclick="openApp('contacts')">👤 通讯录</div>
-          <div class="home-shortcut" onclick="switchView('menu')">≡ 功能表</div>
+        
+        <!-- 中间快捷应用，填补空白 -->
+        <div class="home-apps">
+          <div class="home-app" onclick="openApp('messages')"><div class="icon">✉️</div>信息</div>
+          <div class="home-app" onclick="openApp('contacts')"><div class="icon">👤</div>通讯录</div>
+          <div class="home-app" onclick="openApp('calendar')"><div class="icon">📅</div>日历</div>
+          <div class="home-app" onclick="switchView('menu')"><div class="icon">≡</div>功能表</div>
         </div>
-        <div class="softkey-bar"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
+        
+        <div class="softkey-bar" style="margin-top: auto;"><span class="sk-btn" onclick="switchView('menu')">功能表</span><span class="sk-btn">通讯录</span></div>
       </div>
 
       <!-- 2. 功能表 -->
@@ -196,7 +192,7 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
           <div class="menu-item" onclick="openApp('web')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#00f)">🌐</div><div class="menu-text">网络</div></div>
           <div class="menu-item" onclick="openApp('ovi')"><div class="menu-icon" style="background: linear-gradient(180deg,#fff,#08f)">🛍️</div><div class="menu-text">Ovi</div></div>
         </div>
-        <div class="softkey-bar"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
+        <div class="softkey-bar" style="margin-top: auto;"><span class="sk-btn" onclick="openApp('calc')">打开</span><span class="sk-btn" onclick="switchView('home')">返回</span></div>
       </div>
 
       <!-- 3. App 容器 -->
@@ -231,12 +227,8 @@ body { background: #121212; height: 100vh; display: flex; justify-content: cente
 </div>
 
 <script>
-// 震动反馈
-function vibrate() {
-  if (navigator.vibrate) navigator.vibrate(30);
-}
+function vibrate() { if (navigator.vibrate) navigator.vibrate(30); }
 
-// 时间更新
 function updateTime() {
   const now = new Date();
   const h = now.getHours().toString().padStart(2, '0');
@@ -248,7 +240,6 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-// 视图切换
 let currentView = 'home';
 function switchView(view) {
   vibrate();
@@ -257,11 +248,10 @@ function switchView(view) {
   currentView = view;
 }
 
-// App 数据
 const apps = {
   messages: `<div class="list-item"><div>👤</div><div><b>Sarah</b><br><span style="color:#666;font-size:12px;">今晚7点吃饭吗？</span></div></div>`,
   contacts: `<div class="list-item">👤 Alex Chen</div><div class="list-item">👤 Sarah Johnson</div><div class="list-item">👤 妈妈</div>`,
-  calendar: `<div style="text-align: center; margin-top:20px;">11月 2026<br><br><b>15日</b> 星期六</div>`,
+  calendar: `<div style="text-align: center; margin-top:20px;">11月 2026<br><br><b>15日</b> 星期日</div>`,
   music: `<div style="text-align: center; margin-top: 30px;"><div style="font-size: 50px;">🎵</div><b>Nokia Tune</b></div>`,
   settings: `<div class="list-item">📶 连接方式</div><div class="list-item">🔔 铃声设置</div><div class="list-item">🎨 主题模式</div>`,
   gallery: `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">${Array(9).fill('<div style="height: 70px; background: #ccc;"></div>').join('')}</div>`,
@@ -306,32 +296,24 @@ function calc(val) {
   disp.innerText = window.calcStr;
 }
 
-/* =========================================
-   N95 核心：推拉滑盖逻辑
-   ========================================= */
+/* 推拉滑盖逻辑 */
 const track = document.getElementById('slidingTrack');
-let currentSlide = 0; // 0: 闭合, -260: 数字键盘, 100: 媒体键
+let currentSlide = 0; // 0: 合上, -280: 数字键盘, 100: 媒体键
 
 function slideTo(mode) {
   vibrate();
-  if (mode === 'num') {
-    currentSlide = -260;
-  } else if (mode === 'media') {
-    currentSlide = 100;
-  } else {
-    currentSlide = 0;
-  }
+  if (mode === 'num') currentSlide = -280;
+  else if (mode === 'media') currentSlide = 100;
+  else currentSlide = 0;
   track.style.transform = `translateY(${currentSlide}px)`;
 }
 
-/* 手动拖拽滑盖手势 */
-let startY = 0;
-let isDragging = false;
-let startTransform = 0;
+let startY = 0, isDragging = false, startTransform = 0;
 const phone = document.getElementById('n95Phone');
 
 phone.addEventListener('touchstart', e => {
-  if (e.target.closest('.app-content') || e.target.closest('.home-shortcuts') || e.target.closest('.menu-grid')) return;
+  // 排除在可滚动区域内滑动
+  if (e.target.closest('.app-content') || e.target.closest('.home-apps') || e.target.closest('.menu-grid')) return;
   
   startY = e.touches[0].clientY;
   isDragging = true;
@@ -345,7 +327,7 @@ phone.addEventListener('touchmove', e => {
   let newTransform = startTransform + dy;
   
   if (newTransform > 120) newTransform = 120;
-  if (newTransform < -280) newTransform = -280;
+  if (newTransform < -300) newTransform = -300;
   
   track.style.transform = `translateY(${newTransform}px)`;
   if (e.cancelable) e.preventDefault();
@@ -362,7 +344,7 @@ phone.addEventListener('touchend', e => {
     if (dy < -60) slideTo('num');
     else if (dy > 60) slideTo('media');
     else slideTo('close');
-  } else if (currentSlide === -260) {
+  } else if (currentSlide === -280) {
     if (dy > 60) slideTo('close');
     else slideTo('num');
   } else if (currentSlide === 100) {
