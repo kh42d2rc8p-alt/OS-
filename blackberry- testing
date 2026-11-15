@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BlackBerry OS 7 Mobile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="blackberry-device">
+        <div class="top-bezel">
+            <div class="speaker"></div>
+            <div class="logo">BlackBerry</div>
+        </div>
+
+        <!-- 屏幕区域：现在它也是一块巨大的“盲操触控区” -->
+        <div class="screen" id="screen-area">
+            <div class="status-bar">中国移动 3G <span class="time">12:00</span></div>
+            <div class="app-grid" id="app-grid"></div>
+        </div>
+
+        <!-- 底部微操区域 -->
+        <div class="nav-row">
+            <div class="call-btn green" id="btn-call">接听</div>
+            <!-- 这个圆圈就是你的虚拟光学触控板 -->
+            <div class="trackpad" id="trackpad">
+                <div class="trackpad-inner"></div>
+            </div>
+            <div class="call-btn red" id="btn-end">挂断</div>
+        </div>
+
+        <!-- 经典全键盘（移动端纯装饰） -->
+        <div class="keyboard">
+            <div class="key-row"><span>Q</span><span>W</span><span>E</span><span>R</span><span>T</span><span>Y</span></div>
+            <div class="key-row"><span>A</span><span>S</span><span>D</span><span>F</span><span>G</span><span>H</span></div>
+            <div class="key-row"><span>Z</span><span>X</span><span>C</span><span>V</span><span>B</span><span>N</span></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
