@@ -7,13 +7,15 @@
 <style>
 /* ============ 基础重置 ============ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-body { background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Tahoma', 'Arial', sans-serif; overflow: hidden; }
+body { background: #121212; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Tahoma', 'Arial', sans-serif; overflow: hidden; }
 
-/* ============ N95 手机外壳 (滑盖结构) ============ */
+/* ============ N95 手机外壳 (精准比例) ============ */
 .n95-phone {
-  position: relative; width: 100%; max-width: 400px; height: 100vh; max-height: 850px;
-  background: #111; overflow: hidden; border-radius: 20px; border: 2px solid #333;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+  position: relative; width: 100vw; max-width: 390px; 
+  height: 90vh; max-height: 760px; /* 限制最大高度，不再无限拉长 */
+  aspect-ratio: 9 / 18.5; /* 强制真机比例 */
+  background: #111; overflow: hidden; border-radius: 24px; border: 3px solid #444;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 10px rgba(0,0,0,0.8);
 }
 
 /* 滑动轨道 */
@@ -23,17 +25,17 @@ body { background: #000; height: 100vh; display: flex; justify-content: center; 
   will-change: transform; z-index: 10;
 }
 
-/* ============ 1. 顶部多媒体键盘 (隐藏在滑轨上方) ============ */
+/* ============ 1. 顶部多媒体键盘 ============ */
 .media-pad {
-  position: absolute; top: -120px; left: 0; width: 100%; height: 120px;
+  position: absolute; top: -100px; left: 0; width: 100%; height: 100px;
   background: linear-gradient(180deg, #222 0%, #111 100%);
-  display: flex; justify-content: center; align-items: center; gap: 20px;
+  display: flex; justify-content: center; align-items: center; gap: 15px;
   border-bottom: 1px solid #000; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5);
 }
 .media-btn { 
-  width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(180deg, #444, #111);
+  width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #444, #111);
   border: 1px solid #000; color: #fff; display: flex; justify-content: center; align-items: center;
-  font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer;
+  font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer;
 }
 .media-btn:active { background: #000; transform: scale(0.95); }
 
@@ -46,7 +48,7 @@ body { background: #000; height: 100vh; display: flex; justify-content: center; 
 
 /* 状态栏 */
 .status-bar {
-  height: 24px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; font-size: 11px; color: #333; font-weight: bold;
+  height: 24px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 11px; color: #333; font-weight: bold; flex-shrink: 0;
 }
 .sb-left { display: flex; align-items: center; gap: 5px; }
 .sb-signal { display: flex; align-items: flex-end; gap: 1px; height: 10px; }
@@ -65,7 +67,7 @@ body { background: #000; height: 100vh; display: flex; justify-content: center; 
 
 /* 软键底栏 */
 .softkey-bar {
-  height: 30px; background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%); border-top: 1px solid #999; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px; font-weight: bold; color: #333;
+  height: 32px; background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%); border-top: 1px solid #999; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0;
 }
 .sk-btn { cursor: pointer; padding: 5px; }
 .sk-btn:active { color: #0050ef; }
@@ -73,28 +75,28 @@ body { background: #000; height: 100vh; display: flex; justify-content: center; 
 /* ============ 待机桌面 ============ */
 #home-view { background: radial-gradient(circle at center, #002288 0%, #001144 100%); color: #fff; }
 .home-header { padding: 10px; display: flex; justify-content: space-between; font-size: 12px; text-shadow: 1px 1px 1px #000; }
-.home-clock { text-align: center; margin-top: 40px; text-shadow: 1px 1px 2px #000; }
-.home-clock .time { font-size: 56px; font-weight: bold; letter-spacing: 2px; }
+.home-clock { text-align: center; margin-top: 30px; text-shadow: 1px 1px 2px #000; }
+.home-clock .time { font-size: 52px; font-weight: bold; letter-spacing: 2px; }
 .home-clock .date { font-size: 14px; margin-top: 5px; }
-.home-shortcuts { margin-top: auto; padding: 10px; display: flex; gap: 5px; }
-.home-shortcut { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; padding: 8px; flex: 1; text-align: center; font-size: 12px; color: #fff; cursor: pointer; }
+.home-shortcuts { margin-top: auto; padding: 10px; display: flex; gap: 5px; margin-bottom: 5px; }
+.home-shortcut { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 8px; flex: 1; text-align: center; font-size: 12px; color: #fff; cursor: pointer; }
 .home-shortcut:active { background: rgba(255,255,255,0.4); }
 
 /* ============ 功能表 ============ */
 #menu-view { background: #0050ef; }
-.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; align-content: start; }
 .menu-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .menu-item:active .menu-icon { transform: scale(0.9); }
 .menu-icon {
-  width: 55px; height: 55px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.5);
-  display: flex; justify-content: center; align-items: center; font-size: 24px;
+  width: 50px; height: 50px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center; font-size: 22px;
   box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 3px 5px rgba(0,0,0,0.4);
   background: linear-gradient(180deg, #fff 0%, #ccc 100%); margin-bottom: 5px; transition: transform 0.1s;
 }
 .menu-text { color: #fff; font-size: 12px; text-shadow: 1px 1px 1px #000; font-weight: bold; }
 
 /* ============ App 视图 ============ */
-.app-title { background: linear-gradient(180deg, #4a4a4a 0%, #222 100%); color: #fff; text-align: center; padding: 6px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #000; }
+.app-title { background: linear-gradient(180deg, #4a4a4a 0%, #222 100%); color: #fff; text-align: center; padding: 6px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #000; flex-shrink: 0;}
 .app-content { flex: 1; overflow-y: auto; background: #fff; color: #000; padding: 10px; font-size: 14px; }
 .list-item { padding: 12px 5px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .list-item:active { background: #e0e0e0; }
@@ -106,34 +108,37 @@ body { background: #000; height: 100vh; display: flex; justify-content: center; 
 .calc-btn { background: linear-gradient(180deg, #fff 0%, #ccc 100%); border: 1px solid #999; border-radius: 4px; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 0 #999; }
 .calc-btn:active { box-shadow: none; transform: translateY(2px); }
 
-/* ============ 3. 底部数字键盘 (隐藏在滑轨下方) ============ */
+/* ============ 3. 底部数字键盘 ============ */
 .num-pad {
-  position: absolute; top: 100%; left: 0; width: 100%; height: 280px;
-  background: #1a1a1a; display: flex; flex-direction: column; padding: 10px;
+  position: absolute; top: 100%; left: 0; width: 100%; height: 260px;
+  background: #1a1a1a; display: flex; flex-direction: column; padding: 8px;
 }
 /* 导航键区域 */
-.nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.nav-ring { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(180deg, #333 0%, #111 100%); position: relative; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
-.nav-center { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #555 0%, #222 100%); border: 1px solid #000; }
-.nav-up, .nav-down, .nav-left, .nav-right { position: absolute; color: #aaa; font-size: 14px; }
+.nav-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px;}
+.nav-ring { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(180deg, #333 0%, #111 100%); position: relative; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+.nav-center { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(180deg, #555 0%, #222 100%); border: 1px solid #000; }
+.nav-up, .nav-down, .nav-left, .nav-right { position: absolute; color: #aaa; font-size: 12px; }
 .nav-up { top: 2px; } .nav-down { bottom: 2px; } .nav-left { left: 5px; } .nav-right { right: 5px; }
 /* 软键 */
-.softkey { width: 80px; height: 32px; background: linear-gradient(180deg, #333 0%, #111 100%); border-radius: 16px 16px 4px 4px; color: #fff; font-size: 12px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); border: 1px solid #000; }
+.softkey { width: 70px; height: 28px; background: linear-gradient(180deg, #333 0%, #111 100%); border-radius: 14px 14px 4px 4px; color: #fff; font-size: 12px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); border: 1px solid #000; }
 .softkey:active { background: #000; }
 /* 数字键 */
-.key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; flex: 1; }
-.key { background: linear-gradient(180deg, #3a3a3a 0%, #151515 100%); border-radius: 5px; border: 1px solid #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.5); }
+.key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; flex: 1; }
+.key { background: linear-gradient(180deg, #3a3a3a 0%, #151515 100%); border-radius: 5px; border: 1px solid #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.5); }
 .key:active { background: #000; }
-.key span { font-size: 9px; color: #888; margin-top: 2px; font-weight: normal; text-transform: uppercase; }
+.key span { font-size: 8px; color: #888; margin-top: 2px; font-weight: normal; text-transform: uppercase; }
 
-/* ============ 滑盖提示与控制 ============ */
+/* ============ 滑盖提示 ============ */
 .slide-hint {
-  position: absolute; left: 0; width: 100%; height: 20px; z-index: 100;
+  position: absolute; left: 0; width: 100%; height: 25px; z-index: 100;
   display: flex; justify-content: center; align-items: center; cursor: pointer;
 }
 .slide-hint.top { top: 0; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%); }
 .slide-hint.bottom { bottom: 0; background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%); }
-.hint-text { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+.hint-text { font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -305,14 +310,14 @@ function calc(val) {
    N95 核心：推拉滑盖逻辑
    ========================================= */
 const track = document.getElementById('slidingTrack');
-let currentSlide = 0; // 0: 闭合, -280: 数字键盘, 120: 媒体键
+let currentSlide = 0; // 0: 闭合, -260: 数字键盘, 100: 媒体键
 
 function slideTo(mode) {
   vibrate();
   if (mode === 'num') {
-    currentSlide = -280;
+    currentSlide = -260;
   } else if (mode === 'media') {
-    currentSlide = 120;
+    currentSlide = 100;
   } else {
     currentSlide = 0;
   }
@@ -326,13 +331,12 @@ let startTransform = 0;
 const phone = document.getElementById('n95Phone');
 
 phone.addEventListener('touchstart', e => {
-  // 如果点在屏幕内的列表滚动区，不触发滑盖
   if (e.target.closest('.app-content') || e.target.closest('.home-shortcuts') || e.target.closest('.menu-grid')) return;
   
   startY = e.touches[0].clientY;
   isDragging = true;
   startTransform = currentSlide;
-  track.style.transition = 'none'; // 拖动时取消过渡动画
+  track.style.transition = 'none';
 }, {passive: true});
 
 phone.addEventListener('touchmove', e => {
@@ -340,13 +344,10 @@ phone.addEventListener('touchmove', e => {
   const dy = e.touches[0].clientY - startY;
   let newTransform = startTransform + dy;
   
-  // 限制边界
-  if (newTransform > 150) newTransform = 150;
-  if (newTransform < -320) newTransform = -320;
+  if (newTransform > 120) newTransform = 120;
+  if (newTransform < -280) newTransform = -280;
   
   track.style.transform = `translateY(${newTransform}px)`;
-  
-  // 阻止页面滚动
   if (e.cancelable) e.preventDefault();
 }, {passive: false});
 
@@ -357,21 +358,19 @@ phone.addEventListener('touchend', e => {
   
   const dy = e.changedTouches[0].clientY - startY;
   
-  // 根据滑动距离自动吸附
   if (currentSlide === 0) {
-    if (dy < -80) slideTo('num');
-    else if (dy > 80) slideTo('media');
+    if (dy < -60) slideTo('num');
+    else if (dy > 60) slideTo('media');
     else slideTo('close');
-  } else if (currentSlide === -280) {
-    if (dy > 80) slideTo('close');
+  } else if (currentSlide === -260) {
+    if (dy > 60) slideTo('close');
     else slideTo('num');
-  } else if (currentSlide === 120) {
-    if (dy < -80) slideTo('close');
+  } else if (currentSlide === 100) {
+    if (dy < -60) slideTo('close');
     else slideTo('media');
   }
 });
 
-// 阻止双击缩放
 document.addEventListener('gesturestart', e => e.preventDefault());
 </script>
 </body>
